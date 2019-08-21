@@ -13,7 +13,6 @@ namespace Traitor_God
 {
     internal class TraitorFinder : MonoBehaviour
     {
-        private bool _assigned;
 
         private void Start()
         {
@@ -47,13 +46,13 @@ namespace Traitor_God
 
             GameObject @switch = statue.FindGameObjectInChildren("dream_version_switch");
             @switch.SetActive(true);
-            @switch.transform.position = new Vector3(189.0f, 5.1f, 0.8f);
+            @switch.transform.position = new Vector3(189.0f, 6.5f, 0.8f);
 
             GameObject burst = @switch.FindGameObjectInChildren("Burst Pt");
-            burst.transform.position = new Vector3(189.0f, 4.9f, 0.8f);
+            burst.transform.position = new Vector3(188.4f, 4.9f, 0.8f);
 
             GameObject glow = @switch.FindGameObjectInChildren("Base Glow");
-            glow.transform.position = new Vector3(189.0f, 4.9f, 0.8f);
+            glow.transform.position = new Vector3(188.4f, 5.9f, 3.0f);
 
             glow.GetComponent<tk2dSprite>().color = Color.white;
 
