@@ -1,7 +1,6 @@
 C:\Users\Jason\Documents\Hollow Knight Stuff\Modding\HollowKnight.Traitor-God-master\Traitor God\bin\Debug\net35\Traitor God.dll
 C:\Users\Jason\Documents\Hollow Knight Stuff\Modding\HollowKnight.Traitor-God-master\Traitor God\bin\Debug\net35\Traitor God.pdb
 C:\Users\Jason\Documents\Hollow Knight Stuff\Modding\HollowKnight.Traitor-God-master\Traitor God\bin\Debug\net35\Assembly-CSharp.dll
-C:\Users\Jason\Documents\Hollow Knight Stuff\Modding\HollowKnight.Traitor-God-master\Traitor God\bin\Debug\net35\DebugMod.dll
 C:\Users\Jason\Documents\Hollow Knight Stuff\Modding\HollowKnight.Traitor-God-master\Traitor God\bin\Debug\net35\ModCommon.dll
 C:\Users\Jason\Documents\Hollow Knight Stuff\Modding\HollowKnight.Traitor-God-master\Traitor God\bin\Debug\net35\PlayMaker.dll
 C:\Users\Jason\Documents\Hollow Knight Stuff\Modding\HollowKnight.Traitor-God-master\Traitor God\bin\Debug\net35\UnityEngine.AnimationModule.dll

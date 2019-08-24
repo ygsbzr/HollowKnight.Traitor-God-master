@@ -13,9 +13,9 @@ namespace Traitor_God
 {
     internal class TraitorFinder : MonoBehaviour
     {
-
         private void Start()
         {
+            StartCoroutine(LoadMageLord());
             USceneManager.activeSceneChanged += SceneChanged;
         }
 
@@ -24,10 +24,23 @@ namespace Traitor_God
             if (arg1.name == "GG_Workshop") SetStatue();
             if (arg1.name != "GG_Traitor_Lord") return;
             if (arg0.name != "GG_Workshop") return;
-
+            
             StartCoroutine(AddComponent());
         }
 
+        public static GameObject greyPrince;
+        public static PlayMakerFSM gpzControl;
+        IEnumerator LoadMageLord()
+        {
+            Modding.Logger.Log("Instantiating GPZ");
+            GameManager.instance.LoadScene("GG_Grey_Prince_Zote");
+            yield return null;
+            
+            greyPrince = GameObject.Find("Grey Prince");
+            gpzControl = greyPrince.LocateMyFSM("Control");
+            greyPrince.SetActive(false);
+        }
+        
         private static void SetStatue()
         {
             GameObject statue = GameObject.Find("GG_Statue_TraitorLord");
