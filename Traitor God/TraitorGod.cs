@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
 using Modding;
 using ModCommon;
 using MonoMod.RuntimeDetour;
 using JetBrains.Annotations;
+using UnityEngine;
 using UnityEngine.SceneManagement;
 using USceneManager = UnityEngine.SceneManagement.SceneManager;
 using UObject = UnityEngine.Object;
@@ -17,6 +19,8 @@ namespace Traitor_God
         [PublicAPI]
         public static TraitorGod Instance { get; private set; }
 
+        public static Dictionary<string, GameObject> preloadedGameObjects = new Dictionary<string, GameObject>();
+        
         public override string GetVersion()
         {
             return Assembly.GetAssembly(typeof(TraitorGod)).GetName().Version.ToString();
@@ -24,9 +28,22 @@ namespace Traitor_God
 
         private string _lastScene;
 
-        public override void Initialize()
+        public override List<(string, string)> GetPreloadNames()
         {
+            return new List<(string, string)>
+            {
+                ("GG_Grey_Prince_Zote", "Grey Prince"),
+            };
+        }
+        
+        public override void Initialize(Dictionary<string, Dictionary<string, GameObject>> preloadedObjects)
+        {
+            Log("Storing GameObjects");
+            preloadedGameObjects.Add("GPZ", preloadedObjects["GG_Grey_Prince_Zote"]["Grey Prince"]);
+         
             Instance = this;
+            
+            Log("Initializing...");
 
             Unload();
 
@@ -38,6 +55,8 @@ namespace Traitor_God
             ModHooks.Instance.SetPlayerVariableHook += SetVariableHook;
             ModHooks.Instance.GetPlayerVariableHook += GetVariableHook;
             USceneManager.activeSceneChanged += SceneChanged;
+            
+            Log("Initialized.");
         }
 
         private object SetVariableHook(Type t, string key, object obj)

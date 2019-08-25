@@ -16,7 +16,7 @@ namespace Traitor_God
 {
     internal class Traitor : MonoBehaviour
     {
-        private const int HP = 2500;
+        private const int HP = 2000;
         private HealthManager _hm;
 
         private Vector2 _heroPos;
@@ -65,7 +65,7 @@ namespace Traitor_God
             _control.Fsm.GetFsmFloat("Attack Speed").Value = 70.0f;
             
             // Increase vertical velocity of DSlash jump
-            _control.GetAction<SetVelocity2d>("Jump").y = 35;
+            _control.GetAction<SetVelocity2d>("Jump").y = 40;
 
             // Remove the cooldown between attacks
             _control.RemoveAction<Wait>("Cooldown");
@@ -114,36 +114,33 @@ namespace Traitor_God
             _control.GetAction<SetVelocity2d>("DSlash").y = _dSlashVector.y;
         }
 
-        private void SpawnShockwaves()
+        private Action SpawnShockwaves(float height, float speed, int damage)
         {
+            return () =>
+            {
+                Quaternion angle = Quaternion.Euler(Vector3.zero);
+                Transform trans = transform;
+                Vector3 pos = trans.position;
 
-            Quaternion angle = Quaternion.Euler(Vector3.zero);
-            Transform trans = transform;
-            Vector3 pos = trans.position;
+                bool[] facingRightBools = {false, true};
 
-
-            _shockWave1 = Instantiate(TraitorFinder.gpzControl.
-                GetAction<SpawnObjectFromGlobalPool>("Land Waves")
-                .gameObject.Value, pos.SetY(pos.y - 5), angle);
-            PlayMakerFSM shock = _shockWave1.LocateMyFSM("shockwave");
-            _shockWave1.transform.localScale = new Vector2(1.6f, 1f);
-            shock.FsmVariables.FindFsmBool("Facing Right").Value = true;
-            shock.FsmVariables.FindFsmFloat("Speed").Value = 25f;
-            _shockWave1.SetActive(true);
-            _shockWave1.transform.SetPosition2D(pos);
-
-            _shockWave2 = Instantiate(TraitorFinder.gpzControl
-                .GetAction<SpawnObjectFromGlobalPool>("Land Waves")
-                .gameObject.Value, pos.SetY(pos.y - 5), angle);
-            _shockWave2.GetComponent<Rigidbody2D>().velocity = new Vector2(40, -15);
+                foreach (bool @bool in facingRightBools)
+                {
+                    PlayMakerFSM gpzControl = TraitorGod.preloadedGameObjects["GPZ"].LocateMyFSM("Control");
+                    GameObject shockWave = Instantiate(gpzControl.GetAction<SpawnObjectFromGlobalPool>("Land Waves")
+                        .gameObject.Value);
+                    PlayMakerFSM shock = shockWave.LocateMyFSM("shockwave");
+                    shock.transform.localScale = new Vector2(height, 1.0f);
+                    shock.FsmVariables.FindFsmBool("Facing Right").Value = @bool;
+                    shock.FsmVariables.FindFsmFloat("Speed").Value = speed;
+                    shockWave.AddComponent<DamageHero>().damageDealt = damage;
+                    shockWave.SetActive(true);
+                    shockWave.transform.SetPosition2D(new Vector2(pos.x, 28.1f));    
+                }
+            };
         }
 
-        private void Initialize()
-        {
-            
-        }
-
-        private Action SpeedUpAnim(float fps)
+        private Action SetAnimFPS(int fps)
         {
             return () => { _anim.CurrentClip.fps = fps; };
         }
@@ -151,8 +148,6 @@ namespace Traitor_God
         private GameObject _sickle1;
         private GameObject _sickle2;
 
-        private GameObject _shockWave1;
-        private GameObject _shockWave2;
         private IEnumerator Start()
         {
             yield return null;
@@ -184,20 +179,21 @@ namespace Traitor_God
                     Vector3 pos = trans.position;
                     float x = speed * Math.Sign(trans.localScale.x);
 
-                    _sickle1 = Instantiate(_control.GetAction<SpawnObjectFromGlobalPool>("Sickle Throw")
-                        .gameObject.Value, pos.SetY(pos.y - 2), angle);
-                    _sickle1.GetComponent<Rigidbody2D>().velocity = new Vector2(x, -5);
-                    Destroy(_sickle1.GetComponent<AudioSource>());
+                    float[] sicklePositionYs = {pos.y - 2, pos.y};
 
-                    _sickle2 = Instantiate(_control.GetAction<SpawnObjectFromGlobalPool>("Sickle Throw")
-                        .gameObject.Value, pos.SetY(pos.y - 2), angle);
-                    _sickle2.GetComponent<Rigidbody2D>().velocity = new Vector2(x, -15);
-                    Destroy(_sickle2.GetComponent<AudioSource>());
+                    foreach (float sicklePosY in sicklePositionYs)
+                    {
+                        GameObject sickle = Instantiate(_control
+                            .GetAction<SpawnObjectFromGlobalPool>("Sickle Throw")
+                            .gameObject.Value, pos.SetY(sicklePosY), angle);
+                        sickle.GetComponent<Rigidbody2D>().velocity = new Vector2(x, -15);
+                        Destroy(sickle.GetComponent<AudioSource>());
+                    }
                 };
             }
 
             // Speed up and decrease time of Slash telegraph
-            _control.InsertMethod("Attack 1", 0, SpeedUpAnim(16f));
+            _control.InsertMethod("Attack 1", 0, SetAnimFPS(18));
             
             // Summon two sickles when slashing
             _control.InsertMethod("Attack Swipe", 0, ProjectileSpawner( () => SilentSickle, 40f));
@@ -205,43 +201,30 @@ namespace Traitor_God
             // Target the player during DSlash
             _control.InsertMethod("DSlash Antic", 0, DSlashTargetPlayer);
             
-            _control.InsertMethod("DSlash", 0, DetectWalls);
-            _control.InsertMethod("Land", 0, SpawnShockwaves);
-            _control.InsertMethod("Attack Recover", 0, SetSickleSpeed);
+            //_control.InsertMethod("DSlash", 0, DetectWalls);
+            _control.InsertMethod("Land", 0, SpawnShockwaves(0.5f, 25f, 2));
 
             _hm.hp = HP;
 
             AddWallFall();
 
+            _control.GetAction<SetVelocity2d>("Fall").y = -90;
+
         }
 
-        private Vector2 _sw1Pos;
-        private Vector2 _sw2Pos;
         private Vector2 _sick1Pos;
         private Vector2 _sick2Pos;
         private Vector2 _sickVel;
-        private void Update()
+        /*private void Update()
         {
-            Modding.Logger.Log("HeroController Velocity: " + HeroController.instance.GetComponent<Rigidbody2D>().velocity);
-            _sw1Pos = _shockWave1.transform.position;
-            _sw2Pos = _shockWave2.transform.position;
-
-            _sw1Pos.x += 5;
-            _sw2Pos.x -= 5;
 
             _sick1Pos = _sickle1.transform.position;
             _sick2Pos = _sickle2.transform.position;
 
             _sick1Pos.x += 50;
             _sick2Pos.x -= 50;
-        }
+        }*/
 
-        private void SetSickleSpeed()
-        {
-            _sickVel = _sickle1.GetComponent<Rigidbody2D>().velocity;
-            _sickVel = new Vector2(0, 0);
-        }
-        
         private void DetectWalls()
         {
             if (transform.position.x > 58 || transform.position.x < 23 || transform.position.y > 42)
@@ -259,16 +242,17 @@ namespace Traitor_God
 
             _control.GetAction<Tk2dPlayAnimation>("Jump Antic").clipName = "Fall";
             
-            IEnumerator WallFallAntic()
+            Action WallFallAntic()
             {
-                _control.GetAction<GetVelocity2d>("DSlash").x = 0;
-                _control.GetAction<GetVelocity2d>("DSlash").y = -10;
-                _anim.Play("Enter");
-
-                yield return null;
+                return () =>
+                {
+                    _control.GetAction<GetVelocity2d>("DSlash").x = 0;
+                    _control.GetAction<GetVelocity2d>("DSlash").y = -1;
+                    _anim.Play("Enter");
+                };
             }
             
-            _control.InsertCoroutine("Wall Fall", 0, WallFallAntic);
+            _control.InsertMethod("Wall Fall", 0, WallFallAntic());
         }
 
         private static ParticleSystem AddTrail(GameObject go, float offset = 0, Color? c = null)
@@ -304,10 +288,6 @@ namespace Traitor_God
             ParticleSystem.EmissionModule emission = trail.emission;
             emission.rateOverTime = 0f;
             emission.rateOverDistance = 10f;
-
-            ParticleSystem.SizeOverLifetimeModule sizeOverLifetime = trail.sizeOverLifetime;
-            ParticleSystem.MinMaxCurve minMaxCurve = new ParticleSystem.MinMaxCurve(0.0f, 20.0f);
-            sizeOverLifetime.size = minMaxCurve;
             
             ParticleSystem.CollisionModule collision = trail.collision;
             collision.type = ParticleSystemCollisionType.World;

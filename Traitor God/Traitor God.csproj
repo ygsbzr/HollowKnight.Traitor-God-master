@@ -40,6 +40,8 @@
 
   <ItemGroup>
     <Compile Remove="MantisThrow.cs" />
+    <Compile Remove="Shockwaves.cs" />
+    <Compile Remove="ShockwaveCollisionDamage.cs" />
   </ItemGroup>
 
 </Project>
