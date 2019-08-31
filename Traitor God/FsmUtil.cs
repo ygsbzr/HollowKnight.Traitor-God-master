@@ -349,6 +349,37 @@ namespace Traitor_God
             return @new;
         }
 
+        public static void AddToSendRandomEventV2
+        (
+            this SendRandomEventV2 sre,
+            string toState,
+            float weight,
+            int eventMaxAmount,
+            [CanBeNull] string eventName = null
+        )
+        {
+            var fsm = sre.Fsm.Owner as PlayMakerFSM;
+            string state = sre.State.Name;
+            eventName = eventName ?? toState.Split(' ').First();
+
+            List<FsmEvent> events = sre.events.ToList();
+            List<FsmFloat> weights = sre.weights.ToList();
+            List<FsmInt> trackingInts = sre.trackingInts.ToList();
+            List<FsmInt> eventMax = sre.eventMax.ToList();
+
+            fsm.AddTransition(state, eventName, toState);
+
+            events.Add(fsm.GetState(state).Transitions.Single(x => x.FsmEvent.Name == eventName).FsmEvent);
+            weights.Add(weight);
+            trackingInts.Add(fsm.GetOrCreateInt($"Ct {eventName}"));
+            eventMax.Add(eventMaxAmount);
+
+            sre.events = events.ToArray();
+            sre.weights = weights.ToArray();
+            sre.trackingInts = trackingInts.ToArray();
+            sre.eventMax = eventMax.ToArray();
+        }
+        
         [PublicAPI]
         public static void AddToSendRandomEventV3
         (

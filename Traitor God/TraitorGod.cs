@@ -33,6 +33,10 @@ namespace Traitor_God
             return new List<(string, string)>
             {
                 ("GG_Grey_Prince_Zote", "Grey Prince"),
+                ("Fungus3_11", "fungd_spikes_09_FG 7"),
+                ("Fungus3_11", "fungd_spikes_09_FG"),
+                ("Fungus3_11", "fungd_spike_sil_04"),
+                ("GG_Ghost_No_Eyes_V", "fungd_spikes_0_0001_d"),
             };
         }
         
@@ -40,7 +44,11 @@ namespace Traitor_God
         {
             Log("Storing GameObjects");
             preloadedGameObjects.Add("GPZ", preloadedObjects["GG_Grey_Prince_Zote"]["Grey Prince"]);
-         
+            preloadedGameObjects.Add("ThornsL", preloadedObjects["Fungus3_11"]["fungd_spikes_09_FG 7"]);
+            preloadedGameObjects.Add("ThornsR", preloadedObjects["Fungus3_11"]["fungd_spikes_09_FG"]);
+            preloadedGameObjects.Add("BlackThorns", preloadedObjects["Fungus3_11"]["fungd_spike_sil_04"]);
+            preloadedGameObjects.Add("ThornPoint", preloadedObjects["GG_Ghost_No_Eyes_V"]["fungd_spikes_0_0001_d"]);
+
             Instance = this;
             
             Log("Initializing...");
@@ -55,21 +63,21 @@ namespace Traitor_God
             ModHooks.Instance.SetPlayerVariableHook += SetVariableHook;
             ModHooks.Instance.GetPlayerVariableHook += GetVariableHook;
             USceneManager.activeSceneChanged += SceneChanged;
-            
+                        
             Log("Initialized.");
         }
 
         private object SetVariableHook(Type t, string key, object obj)
         {
             if (key == "statueStateTraitor")
-                Settings.Completion = (BossStatue.Completion)obj;
+                Settings.completion = (BossStatue.Completion)obj;
             return obj;
         }
 
         private object GetVariableHook(Type t, string key, object orig)
         {
             return key == "statueStateTraitor"
-                ? Settings.Completion
+                ? Settings.completion
                 : orig;
         }
 
@@ -126,7 +134,7 @@ namespace Traitor_God
             ModHooks.Instance.SetPlayerVariableHook -= SetVariableHook;
             USceneManager.activeSceneChanged -= SceneChanged;
 
-            var finder = GameManager.instance.gameObject.GetComponent<TraitorFinder>();
+            TraitorFinder finder = GameManager.instance.gameObject.GetComponent<TraitorFinder>();
 
             if (finder != null)
                 UObject.Destroy(finder);

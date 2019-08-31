@@ -7,7 +7,7 @@ namespace Traitor_God
     [Serializable]
     public class SaveSettings : ModSettings, ISerializationCallbackReceiver
     {
-        public BossStatue.Completion Completion = new BossStatue.Completion
+        public BossStatue.Completion completion = new BossStatue.Completion
         {
             isUnlocked = true
         };
@@ -20,7 +20,7 @@ namespace Traitor_God
 
         public void OnBeforeSerialize()
         {
-            StringValues["Completion"] = JsonUtility.ToJson(Completion);
+            StringValues["Completion"] = JsonUtility.ToJson(completion);
         }
 
         public void OnAfterDeserialize()
@@ -29,7 +29,7 @@ namespace Traitor_God
 
             if (string.IsNullOrEmpty(@out)) return;
 
-            Completion = JsonUtility.FromJson<BossStatue.Completion>(@out);
+            completion = JsonUtility.FromJson<BossStatue.Completion>(@out);
         }
     }
 }
