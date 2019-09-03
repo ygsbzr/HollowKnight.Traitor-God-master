@@ -8,7 +8,7 @@ using HutongGames.PlayMaker.Actions;
 using JetBrains.Annotations;
 using Logger = Modding.Logger;
 
-// Taken and modified from https://github.com/KayDeeTee/HK-NGG/blob/master/src/FsmUtil.cs
+// Taken and modified from https://github.com/5FiftySix6/HollowKnight.Pale-Prince/blob/master/Pale%20Prince/FsmUtil.cs
 
 namespace Traitor_God
 {

@@ -7,8 +7,11 @@ using ModCommon;
 using ModCommon.Util;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Bounds = UnityEngine.Bounds;
 using Logger = Modding.Logger;
 using USceneManager = UnityEngine.SceneManagement.SceneManager;
+
+// Taken and modified from https://github.com/5FiftySix6/HollowKnight.Pale-Prince/blob/master/Pale%20Prince/PrinceFinder.cs
 
 namespace Traitor_God
 {
@@ -28,7 +31,7 @@ namespace Traitor_God
             StartCoroutine(AddComponent());
         }
 
-        private static void SetStatue()
+        private void SetStatue()
         {
             GameObject statue = GameObject.Find("GG_Statue_TraitorLord");
 
@@ -43,7 +46,7 @@ namespace Traitor_God
             details.nameKey = details.nameSheet = "Traitor_Name";
             details.descriptionKey = details.descriptionSheet = "Traitor_Desc";
             bs.dreamBossDetails = details;
-            
+
             GameObject altLever = statue.FindGameObjectInChildren("alt_lever");
             altLever.SetActive(true);
             altLever.transform.position = new Vector3(190.0f, 7.5f, 0.9f);
@@ -56,15 +59,25 @@ namespace Traitor_God
 
             GameObject statueDisplayAlt = bs.statueDisplayAlt;
             statueDisplayAlt.SetActive(true);
+            Log("Statue pos before set: " + statueDisplayAlt.transform.position);
 
+            Vector3 pos = new Vector3(188.5f, 9.6f, 0.9f);
+            
             GameObject ggStatue = statue.FindGameObjectInChildren("GG_statues_0006_5");
             Sprite traitorLordStatueSprite = ggStatue.GetComponent<SpriteRenderer>().sprite;
-            statueDisplayAlt.AddComponent<SpriteRenderer>().sprite = traitorLordStatueSprite;
-            Vector3 statueDisplayAltPos = statueDisplayAlt.transform.position;
-            statueDisplayAltPos = new Vector3(188.5f, 12f, 0.9f);
-            Vector3 statueDisplayAltSpriteRendererPos = statueDisplayAlt.GetComponent<SpriteRenderer>().transform.position;
-            statueDisplayAltSpriteRendererPos = new Vector3(188.5f, 12f, 0.9f);
+            SpriteRenderer spriteRenderer = statueDisplayAlt.AddComponent<SpriteRenderer>();
+            Log("SR position before: " + spriteRenderer.transform.position);
+            Sprite sprite = spriteRenderer.sprite = traitorLordStatueSprite;
+            Log("Sprite rect pos: " + sprite.rect.position);
+            statueDisplayAlt.transform.localPosition = new Vector3(0.3f, 3.2f, 0.0f);
             statueDisplayAlt.transform.localRotation = Quaternion.Euler(0, 180, 0);
+            Log("Statue pos after set: " + statueDisplayAlt.transform.position);
+
+            GameObject baseStatue = statue.FindGameObjectInChildren("Statue");
+            Log("baseStatue pos: " + baseStatue.transform.position);
+
+            GameObject statueAlt = statue.FindGameObjectInChildren("StatueAlt");
+            Log("Base/StatueAlt pos: " + statueAlt.transform.position);
 
             BossStatueLever toggle = statue.GetComponentInChildren<BossStatueLever>();
             toggle.SetOwner(bs);

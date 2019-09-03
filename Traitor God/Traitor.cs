@@ -1,16 +1,12 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Security.Cryptography;
 using HutongGames.PlayMaker;
 using HutongGames.PlayMaker.Actions;
 using ModCommon;
 using ModCommon.Util;
-using On.TMPro;
 using UnityEngine;
-using Object = UnityEngine.Object;
 using Random = System.Random;
 using USceneManager = UnityEngine.SceneManagement.SceneManager;
 
@@ -18,19 +14,25 @@ namespace Traitor_God
 {
     internal class Traitor : MonoBehaviour
     {
-        private const int HP = 2000;
+        private const int Phase1Health = 500;
+        private const int Phase2Health = 1000;
+        private const int Phase3Health = 1000;
+        private const int TotalHealth = Phase1Health + Phase2Health + Phase3Health;
 
         private Vector2 _heroPos;
         private Vector2 _traitorPos;
-        private Vector2 _distanceVector;
-        private Vector2 _dSlashVector;
         private int _dSlashSpeed = 75;
+
+        private bool enteredPhase2;
+        private bool enteredPhase3;
 
         private static Color infectionOrange = new Color32(255, 50, 0, 255);
 
         private tk2dSpriteAnimator _anim;
         private AudioSource _audio;
+        private AudioSource _doubleSlamAudio;
         private PlayMakerFSM _control;
+        private PlayMakerFSM _gpzControl;
         private HealthManager _hm;
         private Rigidbody2D _rb;
 
@@ -41,21 +43,27 @@ namespace Traitor_God
         private AudioClip _jumpAudio;
         private AudioClip _landAudio;
         private AudioClip _roarAudio;
+        private AudioClip _slamAudio;
+        private AudioClip _slashAnticAudio;
         private AudioClip _slashAudio;
-
+        
         private ParticleSystem _trail;
 
         private void Awake()
         {
-            _anim = gameObject.GetComponent<tk2dSpriteAnimator>();
-            _audio = gameObject.GetComponent<AudioSource>();
-            _control = gameObject.LocateMyFSM("Mantis");
-            _hm = gameObject.GetComponent<HealthManager>();
-            _rb = gameObject.GetComponent<Rigidbody2D>();
+            if (PlayerData.instance.statueStateTraitorLord.usingAltVersion)
+            {
+                _anim = gameObject.GetComponent<tk2dSpriteAnimator>();
+                _audio = gameObject.GetComponent<AudioSource>();
+                _doubleSlamAudio = gameObject.AddComponent<AudioSource>();
+                _control = gameObject.LocateMyFSM("Mantis");
+                _gpzControl = TraitorGod.preloadedGameObjects["GPZ"].LocateMyFSM("Control");
+                _hm = gameObject.GetComponent<HealthManager>();
+                _rb = gameObject.GetComponent<Rigidbody2D>();
 
-            _hm.OnDeath += DestroyThornPillars;
-            
-            _audio.pitch = 0.9f;
+                _hm.hp = TotalHealth;
+                _hm.OnDeath += DestroyThornPillars;
+            }
         }
 
         private void GetAudioClips()
@@ -65,13 +73,15 @@ namespace Traitor_God
             _jumpAudio = _control.GetAction<AudioPlayerOneShot>("Jump").audioClips[0];
             _landAudio = _control.GetAction<AudioPlayerOneShot>("Land").audioClips[0];
             _roarAudio = _control.GetAction<AudioPlayerOneShot>("Roar").audioClips[0];
+            _slamAudio = (AudioClip)_control.GetAction<AudioPlayerOneShotSingle>("Slamming").audioClip.Value;
+            _slashAnticAudio = _control.GetAction<AudioPlayerOneShot>("Attack Antic").audioClips[0];
             _slashAudio = _control.GetAction<AudioPlayerOneShot>("Attack 1").audioClips[0];
         }
         
         private void ChangeStateValues()
         {
             // Increase range of Slash attack
-            _control.Fsm.GetFsmFloat("Attack Speed").Value = 70.0f;
+            _control.Fsm.GetFsmFloat("Attack Speed").Value = 50.0f;
             
             // Increase vertical velocity of DSlash jump
             _control.GetAction<SetVelocity2d>("Jump").y = 40;
@@ -94,7 +104,7 @@ namespace Traitor_God
             _control.GetAction<SetVelocity2d>("Waves", 7).x = -24; // Left Wave
 
             // Traitor God can perform slam attack at 2/3 health
-            _control.GetAction<IntCompare>("Slam?").integer2 = HP * 2 / 3;
+            _control.GetAction<IntCompare>("Slam?").integer2 = Phase2Health + Phase3Health;
 
             // Make Traitor God back up for the slam at a further distance to compensate for faster waves
             _control.GetAction<FloatCompare>("Too Close?").float2 = 15.0f;
@@ -105,24 +115,44 @@ namespace Traitor_God
             
         }
 
-        /* Always target the player on DSlash */
-        private void DSlashTargetPlayer()
+        private void CreateStates(string[] states)
+        {
+            for (int i = 0; i < states.Length; i++)
+            {
+                string state = states[i];
+                _control.CreateState(state);
+                _control.AddTransition(state, FsmEvent.Finished,
+                    i + 1 < states.Length ? states[i + 1] : "Idle");
+            }
+        }
+        
+        private Vector2 GetVectorToPlayer()
         {
             _heroPos = HeroController.instance.transform.position;
             _traitorPos = transform.position;
 
-            _distanceVector = new Vector2(_heroPos.x - _traitorPos.x, _heroPos.y - _traitorPos.y);
-            _distanceVector.Normalize();
-            // Predictive player tracking based on player movement
-            _distanceVector.x += Math.Sign(_distanceVector.x) * 
+            Vector2 distanceVector = new Vector2(_heroPos.x - _traitorPos.x, _heroPos.y - _traitorPos.y);
+            distanceVector.Normalize();
+            /*_distanceVector.x += Math.Sign(_distanceVector.x) * 
                                  (_distanceVector.x > 0 ? Math.Sign(HeroController.instance.GetComponent<Rigidbody2D>().velocity.x) : 
-                                     -Math.Sign(HeroController.instance.GetComponent<Rigidbody2D>().velocity.x)) * 0.35f;
-            _dSlashVector = _distanceVector * _dSlashSpeed;
+                                     -Math.Sign(HeroController.instance.GetComponent<Rigidbody2D>().velocity.x)) * 0.35f;*/
+            return distanceVector;
+        }
+        
+        /* Always target the player on DSlash */
+        private void DSlashTargetPlayer()
+        {
+            Vector2 _dSlashVector = GetVectorToPlayer() * _dSlashSpeed;;
 
             _control.GetAction<SetVelocity2d>("DSlash").x = _dSlashVector.x;
             _control.GetAction<SetVelocity2d>("DSlash").y = _dSlashVector.y;
         }
-
+        private Action SetAnimFPS(int framesPerSecond)
+        {
+            return () => { _anim.CurrentClip.fps = framesPerSecond; };
+        }
+        
+        /* Spawn shockwaves on either side */
         private Action SpawnShockwaves(float width, float height, float speed, int damage)
         {
             return () =>
@@ -135,8 +165,7 @@ namespace Traitor_God
 
                 foreach (bool @bool in facingRightBools)
                 {
-                    PlayMakerFSM gpzControl = TraitorGod.preloadedGameObjects["GPZ"].LocateMyFSM("Control");
-                    GameObject shockwave = Instantiate(gpzControl.GetAction<SpawnObjectFromGlobalPool>("Land Waves")
+                    GameObject shockwave = Instantiate(_gpzControl.GetAction<SpawnObjectFromGlobalPool>("Land Waves")
                         .gameObject.Value);
                     PlayMakerFSM shockFSM = shockwave.LocateMyFSM("shockwave");
                     shockFSM.transform.localScale = new Vector2(height, width);
@@ -149,11 +178,55 @@ namespace Traitor_God
             };
         }
 
-        private Action SetAnimFPS(int framesPerSecond)
+        /* Spawn sickles during slash */
+        Action SpawnSickles(float speed)
         {
-            return () => { _anim.CurrentClip.fps = framesPerSecond; };
+            return () =>
+            {
+                Quaternion angle = Quaternion.Euler(Vector3.zero);
+                Transform trans = transform;
+                Vector3 pos = trans.position;
+                float x = speed * Math.Sign(trans.localScale.x);
+
+                float[] sicklePositionYs = {pos.y - 2, pos.y};
+
+                foreach (float sicklePosY in sicklePositionYs)
+                {
+                    GameObject sickle = Instantiate(_control
+                        .GetAction<SpawnObjectFromGlobalPool>("Sickle Throw")
+                        .gameObject.Value, pos.SetY(sicklePosY), angle);
+                        
+                    sickle.GetComponent<Rigidbody2D>().velocity = new Vector2(x, 0);
+                    Destroy(sickle.GetComponent<AudioSource>());
+                    Destroy(sickle.GetComponent<PlayMakerFSM>());
+                    Destroy(sickle, 2.0f);
+                }
+            };
         }
 
+        private void SpawnWaves(float speed, float timeToLive)
+        {
+            Vector2 pos = transform.position;
+            float[] velocities = {-speed, speed};
+
+            foreach (float velocity in velocities)
+            {
+                GameObject wave =
+                    Instantiate(_control.GetAction<SpawnObjectFromGlobalPool>("Waves").gameObject.Value);
+                wave.GetComponent<Rigidbody2D>().velocity = new Vector2(velocity, 0);
+                wave.layer = 0;
+                Transform waveTransform = wave.transform;
+                waveTransform.localRotation =
+                    (velocity < 0) ? Quaternion.Euler(0, 180, 0) : Quaternion.Euler(0, 0, 0);
+                waveTransform.position = new Vector2(pos.x, 28.1f);
+                Log("Wave Transform: " + wave.transform.position);
+                wave.PrintSceneHierarchyTree();
+                wave.GetComponent<SpriteRenderer>().sprite = TraitorGod.SPRITES[1];
+                Destroy(wave, timeToLive);
+            }
+        }
+        
+        
         private void ClearGameObjectList(List<GameObject> gameObjectList)
         {
             foreach (GameObject gameObject in gameObjectList)
@@ -162,7 +235,7 @@ namespace Traitor_God
             }
             gameObjectList.Clear();
         }
-
+        
         private IEnumerator RectractThornPillarsAndDestroy()
         {
             SetThornPillarVelocity(120);
@@ -173,6 +246,63 @@ namespace Traitor_God
         private void DestroyThornPillars()
         {
             StartCoroutine(RectractThornPillarsAndDestroy());
+        }
+
+        private void AddDoubleSlam()
+        {
+            string[] states =
+            {
+                "Double Slam Antic",
+                "Double Slam Slamming",
+                "Double Slam Waves 1",
+                "Double Slam Waves 2",
+                "Double Slam Recover",
+            };
+
+            CreateStates(states);
+
+            IEnumerator DoubleSlamAntic()
+            {
+                _anim.Play("Shockwave Antic");
+                _doubleSlamAudio.PlayOneShot(_roarAudio);
+
+                yield return new WaitForSeconds(0.5f);
+            }
+            _control.InsertCoroutine("Double Slam Antic", 0, DoubleSlamAntic);
+
+            IEnumerator DoubleSlamSlamming()
+            {
+                _anim.Play("Shockwave Attack");
+                _doubleSlamAudio.PlayOneShot(_slamAudio);
+                GameCameras.instance.cameraShakeFSM.SendEvent("EnemyKillShake");
+
+                yield return new WaitForSeconds(0.5f);
+            }
+            _control.InsertCoroutine("Double Slam Slamming", 0, DoubleSlamSlamming);
+
+            IEnumerator DoubleSlamWaves1()
+            {
+                SpawnWaves(12, 3);
+
+                yield return new WaitForSeconds(0.5f);
+            }
+            _control.InsertCoroutine("Double Slam Waves 1", 0, DoubleSlamWaves1);
+
+            IEnumerator DoubleSlamWaves2()
+            {
+                SpawnWaves(24, 3);
+
+                yield return new WaitForSeconds(0.5f);
+            }
+            _control.InsertCoroutine("Double Slam Waves 2", 0, DoubleSlamWaves2);
+
+            IEnumerator DoubleSlamRecover()
+            {
+                yield return null;
+            }
+            _control.InsertCoroutine("Double Slam Recover", 0, DoubleSlamRecover);
+            
+            _control.GetAction<SendRandomEventV2>("Slam?").AddToSendRandomEventV2("Double Slam Antic", 0.2f, 2);
         }
         
         private void AddGroundPound()
@@ -187,24 +317,17 @@ namespace Traitor_God
                 "Ground Pound Recover",
             };
             
-            for (int i = 0; i < states.Length; i++)
-            {
-                string state = states[i];
-                _control.CreateState(state);
-                _control.AddTransition(state, FsmEvent.Finished,
-                    i + 1 < states.Length ? states[i + 1] : "Idle");
-            }
+            CreateStates(states);
             
             _audio.time = 0.15f;
             
             IEnumerator GroundPoundJumpAntic()
             {
-                ParticleSystemRenderer psr = _trail.GetComponent<ParticleSystemRenderer>();
-                psr.material.shader = Shader.Find("Particles/Additive (Soft)");
                 ParticleSystem.MainModule main = _trail.main;
                 main.startColor = Color.red;
                 
                 _anim.Play("Jump Antic");
+                _audio.pitch = 0.9f;
                 _audio.PlayOneShot(_jumpAnticAudio);
                 _rb.velocity = new Vector2(0, 0);
 
@@ -218,7 +341,7 @@ namespace Traitor_God
                 _audio.PlayOneShot(_jumpAudio);
                 _rb.velocity = new Vector2(0, 50);
                 
-                yield return new WaitForSeconds(1.5f);
+                yield return new WaitForSeconds(0.5f);
             }
             _control.InsertCoroutine("Ground Pound Jump", 0, GroundPoundJump);
 
@@ -233,7 +356,7 @@ namespace Traitor_God
                 _anim.Play("DSlash");
                 _audio.PlayOneShot(_dSlashAudio);
                 transform.rotation = Quaternion.Euler(0, 0, -Math.Sign(transform.localScale.x));
-                _rb.velocity = new Vector2(0, -150);
+                _rb.velocity = new Vector2(0, -60);
                 while (transform.position.y > 32)
                 {
                     yield return null;
@@ -255,11 +378,9 @@ namespace Traitor_God
 
             IEnumerator GroundPoundRecover()
             {
-                ParticleSystemRenderer psr = _trail.GetComponent<ParticleSystemRenderer>();
-                psr.material.shader = Shader.Find("Particles/Additive (Soft)");
                 ParticleSystem.MainModule main = _trail.main;
                 main.startColor = infectionOrange;
-                
+
                 yield return new WaitForSeconds(1.0f);
                 yield return new WaitForSeconds(1.0f);
             }
@@ -280,7 +401,6 @@ namespace Traitor_God
         private List<GameObject> thornsList = new List<GameObject>();
         private void AddThornPillars()
         {
-
             string[] states =
             {
                 "ThornPillars Appear",
@@ -291,19 +411,13 @@ namespace Traitor_God
                 "ThornPillars Recover",
             };
             
-            
-            for (int i = 0; i < states.Length; i++)
-            {
-                string state = states[i];
-                _control.CreateState(state);
-                _control.AddTransition(state, FsmEvent.Finished, 
-                    i + 1 < states.Length ? states[i + 1] : "Idle");
-            }
+            CreateStates(states);
 
             // Spawn thorn pillars and move them slightly into view at the top of the arena
             IEnumerator ThornPillarsAppear()
             {
                 _audio.time = 0.25f;
+                _audio.pitch = 0.9f;
                 _audio.PlayOneShot(_roarAudio);
                 _anim.Play("Roar");
                 GameCameras.instance.cameraShakeFSM.SendEvent("EnemyKillShake");
@@ -369,11 +483,9 @@ namespace Traitor_God
             IEnumerator ThornPillarsDrop()
             {
                 GameCameras.instance.cameraShakeFSM.SendEvent("EnemyKillShake");
-                
-                
                 SetThornPillarVelocity(-80);
 
-                yield return new WaitForSeconds(0.5f);
+                yield return new WaitForSeconds(0.25f);
             }
             _control.InsertCoroutine("ThornPillars Drop", 0, ThornPillarsDrop);
             
@@ -381,6 +493,7 @@ namespace Traitor_God
             IEnumerator ThornPillarsDropPause()
             {
                 GameCameras.instance.cameraShakeFSM.SendEvent("EnemyKillShake");
+                _audio.PlayOneShot(_landAudio);
 
                 SetThornPillarVelocity(0);
 
@@ -404,6 +517,7 @@ namespace Traitor_God
             {
                 ClearGameObjectList(thornsList);
                 _anim.Play("Idle");
+                
                 yield return null;
             }
             _control.InsertCoroutine("ThornPillars Recover", 0, ThornPillarsRecover);
@@ -411,6 +525,101 @@ namespace Traitor_God
             _control.GetAction<SendRandomEventV2>("Slam?").AddToSendRandomEventV2("ThornPillars Appear", 0.15f, 1);
         }
         
+        GameObject _thornDagger;
+        private void AddThornDaggerThrow()
+        {
+            string[] states =
+            {
+                "Thorn Dagger Throw Antic",
+                "Thorn Dagger Throw",
+                "Thorn Dagger Throw Recover",
+                "Thorn Dagger Throw Destroy Dagger"
+            };
+            
+            CreateStates(states);
+            
+            IEnumerator ThornDaggerThrowAntic()
+            {
+                _anim.Play("Sickle Throw Antic");
+                _audio.pitch = 0.9f;
+                _audio.PlayOneShot(_slashAnticAudio);
+                _rb.velocity = new Vector2(0, 0);
+                
+                yield return new WaitForSeconds(1.0f);
+            }
+            _control.InsertCoroutine("Thorn Dagger Throw Antic", 0, ThornDaggerThrowAntic);
+
+            IEnumerator ThornDaggerThrow()
+            {
+                _anim.Play("Sickle Throw Attack");
+                
+                _thornDagger = Instantiate(TraitorGod.preloadedGameObjects["ThornPoint"]);
+                _thornDagger.SetActive(true);
+                _thornDagger.layer = 11;
+                _thornDagger.AddComponent<BoxCollider2D>();
+                _thornDagger.AddComponent<Rigidbody2D>().isKinematic = true;
+                BoxCollider2D thornDaggerCollider = _thornDagger.GetComponent<BoxCollider2D>();
+                thornDaggerCollider.size = new Vector2(4, 12);
+                _thornDagger.AddComponent<DamageHero>().damageDealt = 2;
+                _thornDagger.AddComponent<NonBouncer>();
+                _thornDagger.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
+                Transform trans = transform;
+                Vector2 pos = trans.position;
+                Vector2 scale = trans.localScale;
+                _thornDagger.transform.position = new Vector2(pos.x, pos.y - 1.5F);
+                _thornDagger.transform.rotation = Quaternion.Euler(0, 0, Math.Sign(scale.x) * 90);
+                _thornDagger.GetComponent<Rigidbody2D>().velocity = new Vector2(Math.Sign(scale.x) * 60, 0);
+
+                ParticleSystem ps = _thornDagger.AddComponent<ParticleSystem>();
+                ParticleSystemRenderer psr = ps.GetComponent<ParticleSystemRenderer>();
+
+                psr.material = psr.trailMaterial = new Material(Shader.Find("Particles/Additive (Soft)"))
+                {
+                    mainTexture = Resources.FindObjectsOfTypeAll<Texture>().FirstOrDefault(x => x.name == "Default-Particle"),
+                    color = infectionOrange
+                };
+                
+                ParticleSystem.MainModule main = ps.main;
+                main.simulationSpace = ParticleSystemSimulationSpace.World;
+                main.startSpeed = 0f;
+                main.startSize = 1;
+                main.startLifetime = .8f;
+                main.startColor = infectionOrange;
+                main.maxParticles = 256;
+
+                ParticleSystem.ShapeModule shape = ps.shape;
+                shape.shapeType = ParticleSystemShapeType.Sphere;
+                shape.radius *= 1f;
+                shape.radiusSpeed = 0.01f;
+                //shape.position = _thornDagger.transform.position;
+
+                ParticleSystem.EmissionModule emission = ps.emission;
+                emission.rateOverTime = 0f;
+                emission.rateOverDistance = 10f;
+
+                yield return new WaitForSeconds(0.25f);
+            }
+            _control.InsertCoroutine("Thorn Dagger Throw", 0, ThornDaggerThrow);
+
+            IEnumerator ThornDaggerThrowRecover()
+            {
+                _anim.Play("Attack Recover");
+                
+                yield return new WaitForSeconds(1.0f);
+            }
+            _control.InsertCoroutine("Thorn Dagger Throw Recover", 0, ThornDaggerThrowRecover);
+
+            IEnumerator ThornDaggerThrowDestroyDagger()
+            {
+                Destroy(_thornDagger, 1.0f);
+
+                yield return null;
+            }
+            _control.InsertCoroutine("Thorn Dagger Throw Destroy Dagger", 0, ThornDaggerThrowDestroyDagger);
+            
+            _control.GetAction<SendRandomEventV2>("Attack Choice").AddToSendRandomEventV2("Thorn Dagger Throw Antic", 0.33f, 1);
+        }
+
         private void AddWallFall()
         {
             _control.CreateState("Wall Fall");
@@ -429,7 +638,6 @@ namespace Traitor_God
                 {
                     yield return null;
                 }
-                
                 _control.SetState("Land");
 
                 yield return null;
@@ -446,10 +654,10 @@ namespace Traitor_God
             {
                 yield return null;
             }
-            
+
             if (PlayerData.instance.statueStateTraitorLord.usingAltVersion == false) yield break;
 
-            _trail = AddTrail(gameObject, 1.8f);
+            _trail = AddTrail(gameObject, 1.8f, infectionOrange);
 
             // Disable empty walks
             _control.RemoveTransition("Feint?", "Feint");
@@ -463,70 +671,49 @@ namespace Traitor_God
             GetAudioClips();
             ChangeStateValues();
 
-            Action SpawnSickles(float speed)
-            {
-                return () =>
-                {
-                    Quaternion angle = Quaternion.Euler(Vector3.zero);
-                    Transform trans = transform;
-                    Vector3 pos = trans.position;
-                    float x = speed * Math.Sign(trans.localScale.x);
-
-                    float[] sicklePositionYs = {pos.y - 2, pos.y};
-
-                    foreach (float sicklePosY in sicklePositionYs)
-                    {
-                        GameObject sickle = Instantiate(_control
-                            .GetAction<SpawnObjectFromGlobalPool>("Sickle Throw")
-                            .gameObject.Value, pos.SetY(sicklePosY), angle);
-                        
-                        sickle.GetComponent<Rigidbody2D>().velocity = new Vector2(x, 0);
-                        sickle.GetComponent<DamageHero>().damageDealt = 2;
-                        Destroy(sickle.GetComponent<AudioSource>());
-                        Destroy(sickle.GetComponent<PlayMakerFSM>());
-                    }
-                };
-            }
-
             // Speed up and decrease time of Slash telegraph
-            _control.InsertMethod("Attack 1", 0, SetAnimFPS(18));
+            _control.InsertMethod("Attack 1", 0, SetAnimFPS(16));
             // Summon two sickles when slashing
             _control.InsertMethod("Attack Swipe", 0, SpawnSickles(40f));
             // Target the player during DSlash
             _control.InsertMethod("DSlash Antic", 0, DSlashTargetPlayer);
             // Spawn shockwaves when landing after a DSlash
-            _control.InsertMethod("Land", 0, SpawnShockwaves(1, 0.5f, 25, 2));
+            _control.InsertMethod("Land", 0, SpawnShockwaves(1, 1f, 25, 2));
 
             // Loop animations
             _anim.GetClipByName("DSlash").wrapMode = tk2dSpriteAnimationClip.WrapMode.Loop;
 
-            _hm.hp = HP;
-
+            AddDoubleSlam();
             AddGroundPound();
-            AddThornPillars();
             AddWallFall();
+
+            // Change sprites using Mola's Traitor God sprite sheet
+            gameObject.GetComponent<tk2dSprite>().GetCurrentSpriteDef().material.mainTexture = TraitorGod.SPRITES[0].texture;
             
-            _control.GetAction<SetVelocity2d>("Fall").y = -90;
+            _control.GetAction<SetVelocity2d>("Fall").y = -60;
         }
-        
-        private string prevState = "Emerge Dust";
-        private Vector2 prevPos = new Vector2();
         private void Update()
         {
-            if (transform.position.x != prevPos.x && transform.position.y != prevPos.y)
+            if (PlayerData.instance.statueStateTraitorLord.usingAltVersion)
             {
-                //Log("Position: " + transform.position);
-                prevPos = transform.position;
-            }
-                
-            if (_control.ActiveStateName != prevState)
-            {
-                //Log("Current State: " + _control.ActiveStateName);
-                prevState = _control.ActiveStateName;
+                /* Hacky method of dividing fight into 3 phases */
+                if (_hm.hp <= (Phase2Health + Phase3Health) && !enteredPhase2)
+                {
+                    enteredPhase2 = true;
+                    AddThornDaggerThrow();
+                }
+
+                if (_hm.hp <= Phase3Health && !enteredPhase3)
+                {
+                    Log("Entered Phase 3");
+                    enteredPhase3 = true;
+                    AddThornPillars();
+                }
             }
         }
 
-        // Transition to Wall Fall state when Traitor God is in the DSlash state, encounters a wall or roof, and is off the ground
+        /* Transition to Wall Fall state when Traitor God is in the DSlash state,
+         encounters a wall or roof, and is off the ground */
         private void OnCollisionEnter2D(Collision2D collision)
         {
             if (_control.ActiveStateName == "DSlash" && collision.collider.gameObject.layer == 8 && transform.position.y > 31.6)
@@ -535,17 +722,16 @@ namespace Traitor_God
             }
         }
         
+        /* Taken and modified from https://github.com/5FiftySix6/HollowKnight.Pale-Prince/blob/master/Pale%20Prince/Prince.cs */
         private static ParticleSystem AddTrail(GameObject go, float offset = 0, Color? c = null)
         {
             var trail = go.AddComponent<ParticleSystem>();
             var rend = trail.GetComponent<ParticleSystemRenderer>();
 
-            Color trailColor = infectionOrange;
-
             rend.material = rend.trailMaterial = new Material(Shader.Find("Particles/Additive (Soft)"))
             {
                 mainTexture = Resources.FindObjectsOfTypeAll<Texture>().FirstOrDefault(x => x.name == "Default-Particle"),
-                color = c ?? trailColor
+                color = c ?? Color.white
             };
 
             ParticleSystem.MainModule main = trail.main;
@@ -553,7 +739,7 @@ namespace Traitor_God
             main.startSpeed = 0f;
             main.startSize = 4;
             main.startLifetime = .8f;
-            main.startColor = c ?? trailColor;
+            main.startColor = c ?? Color.white;
             main.maxParticles = 256;
 
             ParticleSystem.ShapeModule shape = trail.shape;

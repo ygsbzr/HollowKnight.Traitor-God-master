@@ -2,6 +2,8 @@
 using Modding;
 using UnityEngine;
 
+// Taken from https://github.com/5FiftySix6/HollowKnight.Pale-Prince/blob/master/Pale%20Prince/SaveSettings.cs
+
 namespace Traitor_God
 {
     [Serializable]

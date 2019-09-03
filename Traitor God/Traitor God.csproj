@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net35</TargetFramework>
     <RootNamespace>Traitor_God</RootNamespace>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -27,6 +28,9 @@
     <Reference Include="UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Hollow Knight\hollow_knight_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine.ImageConversionModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Hollow Knight\hollow_knight_Data\Managed\UnityEngine.ImageConversionModule.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine.JSONSerializeModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Hollow Knight\hollow_knight_Data\Managed\UnityEngine.JSONSerializeModule.dll</HintPath>
     </Reference>
@@ -40,5 +44,21 @@
 
   <ItemGroup>
     <Compile Remove="DestroyOnBoundaryLeave.cs" />
+    <Compile Remove="DestroyAfterTime.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Assets\Resources\Textures\mega_mantis_slash_thing0000.png" />
+    <None Remove="Assets\Resources\Textures\mega_mantis_slash_thing0001.png" />
+    <None Remove="Assets\Resources\Textures\mega_mantis_slash_thing0002.png" />
+    <None Remove="Assets\Resources\Textures\mega_mantis_slash_thing0003.png" />
+    <None Remove="Assets\Resources\Textures\mega_mantis_slash_thing0004.png" />
+    <None Remove="Assets\Resources\Textures\mega_mantis_slash_thing0005.png" />
+    <None Remove="Assets\Resources\Textures\waves.png" />
+    <None Remove="Assets\Resources\Textures\Traitor_Lord_Sprites.png.meta" />
+    <None Remove="Assets\Resources\Textures\Traitor_Lord_Sprites.png" />
+    <EmbeddedResource Include="Assets\Resources\Textures\0_Traitor_Lord_Sprites.png" />
+    <None Remove="Assets\Resources\Textures\1_waves.png" />
+    <EmbeddedResource Include="Assets\Resources\Textures\1_waves.png" />
   </ItemGroup>
 </Project>
