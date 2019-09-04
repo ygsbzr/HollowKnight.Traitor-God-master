@@ -63,6 +63,10 @@ namespace Traitor_God
                 _hm.hp = TotalHealth;
                 _hm.OnDeath += DestroyThornPillars;
             }
+            else
+            {
+                ResetOldValues();
+            }
         }
 
         private void ChangeStateValues()
@@ -242,7 +246,8 @@ namespace Traitor_God
         }
 
         private void ResetOldValues()
-        { 
+        {
+            Log("Calling ResetOldValues");
             gameObject.GetComponent<tk2dSprite>().GetCurrentSpriteDef().material.mainTexture = TraitorGod.SPRITES[3].texture;
 
             Vector3 pos = Vector3.zero;
@@ -257,7 +262,7 @@ namespace Traitor_God
         private void SceneChanged(Scene previousScene, Scene currentScene)
         {
             if ((currentScene.name == "GG_Traitor_Lord") && !PlayerData.instance.statueStateTraitorLord.usingAltVersion)
-            {
+        {
                 Log("Resetting Old Values");
                 ResetOldValues();
             }
