@@ -59,25 +59,18 @@ namespace Traitor_God
 
             GameObject statueDisplayAlt = bs.statueDisplayAlt;
             statueDisplayAlt.SetActive(true);
-            Log("Statue pos before set: " + statueDisplayAlt.transform.position);
 
             Vector3 pos = new Vector3(188.5f, 9.6f, 0.9f);
             
             GameObject ggStatue = statue.FindGameObjectInChildren("GG_statues_0006_5");
             Sprite traitorLordStatueSprite = ggStatue.GetComponent<SpriteRenderer>().sprite;
             SpriteRenderer spriteRenderer = statueDisplayAlt.AddComponent<SpriteRenderer>();
-            Log("SR position before: " + spriteRenderer.transform.position);
             Sprite sprite = spriteRenderer.sprite = traitorLordStatueSprite;
-            Log("Sprite rect pos: " + sprite.rect.position);
             statueDisplayAlt.transform.localPosition = new Vector3(0.3f, 3.2f, 0.0f);
             statueDisplayAlt.transform.localRotation = Quaternion.Euler(0, 180, 0);
-            Log("Statue pos after set: " + statueDisplayAlt.transform.position);
 
             GameObject baseStatue = statue.FindGameObjectInChildren("Statue");
-            Log("baseStatue pos: " + baseStatue.transform.position);
-
             GameObject statueAlt = statue.FindGameObjectInChildren("StatueAlt");
-            Log("Base/StatueAlt pos: " + statueAlt.transform.position);
 
             BossStatueLever toggle = statue.GetComponentInChildren<BossStatueLever>();
             toggle.SetOwner(bs);

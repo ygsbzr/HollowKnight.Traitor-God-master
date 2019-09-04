@@ -43,22 +43,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Remove="DestroyOnBoundaryLeave.cs" />
-    <Compile Remove="DestroyAfterTime.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Remove="Assets\Resources\Textures\mega_mantis_slash_thing0000.png" />
-    <None Remove="Assets\Resources\Textures\mega_mantis_slash_thing0001.png" />
-    <None Remove="Assets\Resources\Textures\mega_mantis_slash_thing0002.png" />
-    <None Remove="Assets\Resources\Textures\mega_mantis_slash_thing0003.png" />
-    <None Remove="Assets\Resources\Textures\mega_mantis_slash_thing0004.png" />
-    <None Remove="Assets\Resources\Textures\mega_mantis_slash_thing0005.png" />
-    <None Remove="Assets\Resources\Textures\waves.png" />
-    <None Remove="Assets\Resources\Textures\Traitor_Lord_Sprites.png.meta" />
-    <None Remove="Assets\Resources\Textures\Traitor_Lord_Sprites.png" />
-    <EmbeddedResource Include="Assets\Resources\Textures\0_Traitor_Lord_Sprites.png" />
-    <None Remove="Assets\Resources\Textures\1_waves.png" />
-    <EmbeddedResource Include="Assets\Resources\Textures\1_waves.png" />
+    <EmbeddedResource Include="Assets\0_TraitorGod.png" />
+    <EmbeddedResource Include="Assets\1_Waves.png" />
+    <EmbeddedResource Include="Assets\2_ThornSpear.png" />
+    <EmbeddedResource Include="Assets\3_TraitorLord.png" />
+    <EmbeddedResource Include="Assets\4_Waves.png" />
   </ItemGroup>
 </Project>

@@ -432,6 +432,17 @@ namespace Traitor_God
             return state;
         }
 
+        public static void CreateStates(this PlayMakerFSM fsm, string[] stateNames)
+        {
+            for (int i = 0; i < stateNames.Length; i++)
+            {
+                string state = stateNames[i];
+                fsm.CreateState(state);
+                fsm.AddTransition(state, FsmEvent.Finished,
+                    i + 1 < stateNames.Length ? stateNames[i + 1] : "Idle");
+            }
+        }
+        
         private static void Log(string str)
         {
             Logger.Log("[FSM UTIL]: " + str);

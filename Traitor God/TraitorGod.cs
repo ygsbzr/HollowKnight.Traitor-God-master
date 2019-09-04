@@ -21,7 +21,7 @@ namespace Traitor_God
     {
         
         public static readonly List<Sprite> SPRITES = new List<Sprite>();
-        public static readonly List<byte[]> SPRITEBYTE = new List<byte[]>();
+        public static readonly List<byte[]> SPRITEBYTES = new List<byte[]>();
         
         [PublicAPI]
         public static TraitorGod Instance { get; private set; }
@@ -55,6 +55,7 @@ namespace Traitor_God
             preloadedGameObjects.Add("ThornsR", preloadedObjects["Fungus3_11"]["fungd_spikes_09_FG"]);
             preloadedGameObjects.Add("BlackThorns", preloadedObjects["Fungus3_11"]["fungd_spike_sil_04"]);
             preloadedGameObjects.Add("ThornPoint", preloadedObjects["GG_Ghost_No_Eyes_V"]["fungd_spikes_0_0001_d"]);
+            preloadedGameObjects.Add("ThornSpear", preloadedObjects["GG_Ghost_No_Eyes_V"]["fungd_spikes_0_0001_d"]);
 
             Instance = this;
             
@@ -93,7 +94,7 @@ namespace Traitor_God
                     var texture = new Texture2D(1, 1);
                     texture.LoadImage(buffer, true);
                     // Create sprite from texture
-                    SPRITEBYTE.Add(buffer);
+                    SPRITEBYTES.Add(buffer);
                     SPRITES.Add(Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f)));
 
                     Log("Created sprite from embedded image: " + resource + " at index " + index);
