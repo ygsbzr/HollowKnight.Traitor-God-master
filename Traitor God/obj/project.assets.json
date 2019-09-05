@@ -8,24 +8,30 @@
     ".NETFramework,Version=v3.5": []
   },
   "packageFolders": {
-    "/home/jngo102/.nuget/packages/": {}
+    "C:\\Users\\Jason\\.nuget\\packages\\": {},
+    "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/home/jngo102/Documents/Hollow Knight Stuff/Modding/HollowKnight.Traitor-God-master/Traitor God/Traitor God.csproj",
+      "projectUniqueName": "C:\\Users\\Jason\\Documents\\Hollow Knight Stuff\\Modding\\HollowKnight.Traitor-God-master\\Traitor God\\Traitor God.csproj",
       "projectName": "Traitor God",
-      "projectPath": "/home/jngo102/Documents/Hollow Knight Stuff/Modding/HollowKnight.Traitor-God-master/Traitor God/Traitor God.csproj",
-      "packagesPath": "/home/jngo102/.nuget/packages/",
-      "outputPath": "/home/jngo102/Documents/Hollow Knight Stuff/Modding/HollowKnight.Traitor-God-master/Traitor God/obj/",
+      "projectPath": "C:\\Users\\Jason\\Documents\\Hollow Knight Stuff\\Modding\\HollowKnight.Traitor-God-master\\Traitor God\\Traitor God.csproj",
+      "packagesPath": "C:\\Users\\Jason\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\Jason\\Documents\\Hollow Knight Stuff\\Modding\\HollowKnight.Traitor-God-master\\Traitor God\\obj\\",
       "projectStyle": "PackageReference",
+      "fallbackFolders": [
+        "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
+      ],
       "configFilePaths": [
-        "/home/jngo102/.config/NuGet/NuGet.Config"
+        "C:\\Users\\Jason\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
         "net35"
       ],
       "sources": {
+        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
