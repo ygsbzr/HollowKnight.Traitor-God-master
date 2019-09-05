@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Reflection;
 using Modding;
 using ModCommon;
@@ -11,11 +12,17 @@ using UnityEngine.SceneManagement;
 using USceneManager = UnityEngine.SceneManagement.SceneManager;
 using UObject = UnityEngine.Object;
 
+// Taken and modified from https://github.com/5FiftySix6/HollowKnight.Pale-Prince/blob/master/Pale%20Prince/PalePrince.cs
+
 namespace Traitor_God
 {
     [UsedImplicitly]
     public class TraitorGod : Mod<SaveSettings>, ITogglableMod
     {
+        
+        public static readonly List<Sprite> SPRITES = new List<Sprite>();
+        public static readonly List<byte[]> SPRITEBYTES = new List<byte[]>();
+        
         [PublicAPI]
         public static TraitorGod Instance { get; private set; }
 
@@ -48,6 +55,7 @@ namespace Traitor_God
             preloadedGameObjects.Add("ThornsR", preloadedObjects["Fungus3_11"]["fungd_spikes_09_FG"]);
             preloadedGameObjects.Add("BlackThorns", preloadedObjects["Fungus3_11"]["fungd_spike_sil_04"]);
             preloadedGameObjects.Add("ThornPoint", preloadedObjects["GG_Ghost_No_Eyes_V"]["fungd_spikes_0_0001_d"]);
+            preloadedGameObjects.Add("ThornSpear", preloadedObjects["GG_Ghost_No_Eyes_V"]["fungd_spikes_0_0001_d"]);
 
             Instance = this;
             
@@ -63,6 +71,36 @@ namespace Traitor_God
             ModHooks.Instance.SetPlayerVariableHook += SetVariableHook;
             ModHooks.Instance.GetPlayerVariableHook += GetVariableHook;
             USceneManager.activeSceneChanged += SceneChanged;
+            
+            // Taken from https://github.com/SalehAce1/PaleChampion/blob/master/PaleChampion/PaleChampion/PaleChampion.cs
+            int index = 0;
+            Assembly assembly = Assembly.GetExecutingAssembly();
+            foreach (string resource in assembly.GetManifestResourceNames())
+            {
+                if (!resource.EndsWith(".png"))
+                {
+                    continue;
+                }
+                
+                using (Stream stream = assembly.GetManifestResourceStream(resource))
+                {
+                    if (stream == null) continue;
+
+                    byte[] buffer = new byte[stream.Length];
+                    stream.Read(buffer, 0, buffer.Length);
+                    stream.Dispose();
+
+                    // Create texture from bytes
+                    var texture = new Texture2D(1, 1);
+                    texture.LoadImage(buffer, true);
+                    // Create sprite from texture
+                    SPRITEBYTES.Add(buffer);
+                    SPRITES.Add(Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f)));
+
+                    Log("Created sprite from embedded image: " + resource + " at index " + index);
+                    index++;
+                }
+            }
                         
             Log("Initialized.");
         }
@@ -88,10 +126,17 @@ namespace Traitor_God
 
         private string OnLangGet(string key, string sheettitle)
         {
+            /*string text = Language.Language.GetInternal(key, sheettitle);
+            Log("Key: " + key);
+            Log("Text: " + text);
+            return text;*/
+            
             switch (key)
             {
                 case "Traitor_Name":
                     return "Traitor God";
+                case "TRAITOR_LORD_MAIN" when _lastScene == "GG_Workshop" && PlayerData.instance.statueStateTraitorLord.usingAltVersion:
+                    return "Traitor";
                 case "TRAITOR_LORD_SUB" when _lastScene == "GG_Workshop" && PlayerData.instance.statueStateTraitorLord.usingAltVersion:
                     return "God";
                 case "Traitor_Desc":

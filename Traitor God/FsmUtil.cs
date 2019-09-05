@@ -8,7 +8,7 @@ using HutongGames.PlayMaker.Actions;
 using JetBrains.Annotations;
 using Logger = Modding.Logger;
 
-// Taken and modified from https://github.com/KayDeeTee/HK-NGG/blob/master/src/FsmUtil.cs
+// Taken and modified from https://github.com/5FiftySix6/HollowKnight.Pale-Prince/blob/master/Pale%20Prince/FsmUtil.cs
 
 namespace Traitor_God
 {
@@ -432,6 +432,17 @@ namespace Traitor_God
             return state;
         }
 
+        public static void CreateStates(this PlayMakerFSM fsm, string[] stateNames)
+        {
+            for (int i = 0; i < stateNames.Length; i++)
+            {
+                string state = stateNames[i];
+                fsm.CreateState(state);
+                fsm.AddTransition(state, FsmEvent.Finished,
+                    i + 1 < stateNames.Length ? stateNames[i + 1] : "Idle");
+            }
+        }
+        
         private static void Log(string str)
         {
             Logger.Log("[FSM UTIL]: " + str);
