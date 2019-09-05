@@ -33,7 +33,8 @@ namespace Traitor_God
 
         private tk2dSpriteAnimator _anim;
         private AudioSource _audio;
-        private PlayMakerFSM _control;
+        // Control is accessed by TinkSound, so make it public and static
+        public static PlayMakerFSM Control;
         private PlayMakerFSM _gpzControl;
         private HealthManager _hm;
         private Rigidbody2D _rb;
@@ -60,7 +61,7 @@ namespace Traitor_God
                 "Double Slam Recover",
             };
 
-            _control.CreateStates(states);
+            Control.CreateStates(states);
 
             IEnumerator DoubleSlamAntic()
             {
@@ -69,7 +70,7 @@ namespace Traitor_God
 
                 yield return new WaitForSeconds(0.5f);
             }
-            _control.InsertCoroutine("Double Slam Antic", 0, DoubleSlamAntic);
+            Control.InsertCoroutine("Double Slam Antic", 0, DoubleSlamAntic);
 
             IEnumerator DoubleSlamSlamming()
             {
@@ -79,7 +80,7 @@ namespace Traitor_God
 
                 yield return new WaitForSeconds(0.5f);
             }
-            _control.InsertCoroutine("Double Slam Slamming", 0, DoubleSlamSlamming);
+            Control.InsertCoroutine("Double Slam Slamming", 0, DoubleSlamSlamming);
 
             IEnumerator DoubleSlamWaves1()
             {
@@ -87,7 +88,7 @@ namespace Traitor_God
 
                 yield return new WaitForSeconds(0.5f);
             }
-            _control.InsertCoroutine("Double Slam Waves 1", 0, DoubleSlamWaves1);
+            Control.InsertCoroutine("Double Slam Waves 1", 0, DoubleSlamWaves1);
 
             IEnumerator DoubleSlamWaves2()
             {
@@ -95,15 +96,15 @@ namespace Traitor_God
 
                 yield return new WaitForSeconds(0.5f);
             }
-            _control.InsertCoroutine("Double Slam Waves 2", 0, DoubleSlamWaves2);
+            Control.InsertCoroutine("Double Slam Waves 2", 0, DoubleSlamWaves2);
 
             IEnumerator DoubleSlamRecover()
             {
                 yield return null;
             }
-            _control.InsertCoroutine("Double Slam Recover", 0, DoubleSlamRecover);
+            Control.InsertCoroutine("Double Slam Recover", 0, DoubleSlamRecover);
             
-            _control.GetAction<SendRandomEventV2>("Slam?").AddToSendRandomEventV2("Double Slam Antic", 0.2f, 2);
+            Control.GetAction<SendRandomEventV2>("Slam?").AddToSendRandomEventV2("Double Slam Antic", 0.2f, 2);
         }
         
         private void AddGroundPound()
@@ -118,7 +119,7 @@ namespace Traitor_God
                 "Ground Pound Recover",
             };
             
-            _control.CreateStates(states);
+            Control.CreateStates(states);
             
             _audio.time = 0.15f;
             
@@ -135,7 +136,7 @@ namespace Traitor_God
                 yield return new WaitForSeconds(0.25f);
                 yield return new WaitForSeconds(0.25f);
             }
-            _control.InsertCoroutine("Ground Pound Jump Antic", 0, GroundPoundJumpAntic);
+            Control.InsertCoroutine("Ground Pound Jump Antic", 0, GroundPoundJumpAntic);
             
             IEnumerator GroundPoundJump()
             {
@@ -145,13 +146,13 @@ namespace Traitor_God
                 
                 yield return new WaitForSeconds(0.5f);
             }
-            _control.InsertCoroutine("Ground Pound Jump", 0, GroundPoundJump);
+            Control.InsertCoroutine("Ground Pound Jump", 0, GroundPoundJump);
 
             IEnumerator GroundPoundFallAntic()
             {
                 yield return null;
             }
-            _control.InsertCoroutine("Ground Pound Fall Antic", 0, GroundPoundFallAntic);
+            Control.InsertCoroutine("Ground Pound Fall Antic", 0, GroundPoundFallAntic);
             
             IEnumerator GroundPoundFall()
             {
@@ -164,7 +165,7 @@ namespace Traitor_God
                     yield return null;
                 }
             }
-            _control.InsertCoroutine("Ground Pound Fall", 0, GroundPoundFall);
+            Control.InsertCoroutine("Ground Pound Fall", 0, GroundPoundFall);
             
             IEnumerator GroundPoundLand()
             {
@@ -176,8 +177,8 @@ namespace Traitor_God
                 
                 yield return null;
             }
-            _control.InsertCoroutine("Ground Pound Land", 0, GroundPoundLand);
-            _control.InsertMethod("Ground Pound Land", 0, SpawnShockwaves(2, 2, 75, 2));
+            Control.InsertCoroutine("Ground Pound Land", 0, GroundPoundLand);
+            Control.InsertMethod("Ground Pound Land", 0, SpawnShockwaves(2, 2, 75, 2));
 
             IEnumerator GroundPoundRecover()
             {
@@ -187,10 +188,10 @@ namespace Traitor_God
                 yield return new WaitForSeconds(1.0f);
                 yield return new WaitForSeconds(1.0f);
             }
-            _control.InsertCoroutine("Ground Pound Recover", 0, GroundPoundRecover);
+            Control.InsertCoroutine("Ground Pound Recover", 0, GroundPoundRecover);
 
             
-            _control.GetAction<SendRandomEventV2>("Attack Choice").AddToSendRandomEventV2("Ground Pound Jump Antic", 0.33f, 1);
+            Control.GetAction<SendRandomEventV2>("Attack Choice").AddToSendRandomEventV2("Ground Pound Jump Antic", 0.33f, 1);
         }
 
         void SetThornPillarVelocity(float y)
@@ -214,7 +215,7 @@ namespace Traitor_God
                 "ThornPillars Recover",
             };
             
-            _control.CreateStates(states);
+            Control.CreateStates(states);
 
             // Spawn thorn pillars and move them slightly into view at the top of the arena
             IEnumerator ThornPillarsAppear()
@@ -271,7 +272,7 @@ namespace Traitor_God
                 
                 yield return new WaitForSeconds(0.25f);
             }
-            _control.InsertCoroutine("ThornPillars Appear", 0, ThornPillarsAppear);
+            Control.InsertCoroutine("ThornPillars Appear", 0, ThornPillarsAppear);
 
             // Pause briefly to allow player to react
             IEnumerator ThornPillarsAppearPause()
@@ -280,7 +281,7 @@ namespace Traitor_God
 
                 yield return new WaitForSeconds(0.5f);
             }
-            _control.InsertCoroutine("ThornPillars Appear Pause", 0, ThornPillarsAppearPause);
+            Control.InsertCoroutine("ThornPillars Appear Pause", 0, ThornPillarsAppearPause);
             
             // Drop thorn pillars
             IEnumerator ThornPillarsDrop()
@@ -290,7 +291,7 @@ namespace Traitor_God
 
                 yield return new WaitForSeconds(0.25f);
             }
-            _control.InsertCoroutine("ThornPillars Drop", 0, ThornPillarsDrop);
+            Control.InsertCoroutine("ThornPillars Drop", 0, ThornPillarsDrop);
             
             // Keep pillars fully dropped for half a second while gradually fading out roar
             IEnumerator ThornPillarsDropPause()
@@ -304,7 +305,7 @@ namespace Traitor_God
 
 
             }
-            _control.InsertCoroutine("ThornPillars Drop Pause", 0, ThornPillarsDropPause);
+            Control.InsertCoroutine("ThornPillars Drop Pause", 0, ThornPillarsDropPause);
 
             // Retract pillars
             IEnumerator ThornPillarsRetract()
@@ -313,7 +314,7 @@ namespace Traitor_God
 
                 yield return new WaitForSeconds(0.5f);
             }
-            _control.InsertCoroutine("ThornPillars Retract", 0, ThornPillarsRetract);
+            Control.InsertCoroutine("ThornPillars Retract", 0, ThornPillarsRetract);
 
             // Remove thorn pillars
             IEnumerator ThornPillarsRecover()
@@ -323,9 +324,9 @@ namespace Traitor_God
                 
                 yield return null;
             }
-            _control.InsertCoroutine("ThornPillars Recover", 0, ThornPillarsRecover);
+            Control.InsertCoroutine("ThornPillars Recover", 0, ThornPillarsRecover);
             
-            _control.GetAction<SendRandomEventV2>("Slam?").AddToSendRandomEventV2("ThornPillars Appear", 0.15f, 1);
+            Control.GetAction<SendRandomEventV2>("Slam?").AddToSendRandomEventV2("ThornPillars Appear", 0.15f, 1);
         }
         
         GameObject _thornSpear;
@@ -339,7 +340,7 @@ namespace Traitor_God
                 "Thorn Spear Throw Destroy Spear"
             };
             
-            _control.CreateStates(states);
+            Control.CreateStates(states);
             
             IEnumerator ThornSpearThrowAntic()
             {
@@ -350,7 +351,7 @@ namespace Traitor_God
                 
                 yield return new WaitForSeconds(1.0f);
             }
-            _control.InsertCoroutine("Thorn Spear Throw Antic", 0, ThornSpearThrowAntic);
+            Control.InsertCoroutine("Thorn Spear Throw Antic", 0, ThornSpearThrowAntic);
 
             IEnumerator ThornSpearThrow()
             {
@@ -363,6 +364,7 @@ namespace Traitor_God
                 _thornSpear.layer = 11;
                 _thornSpear.AddComponent<BoxCollider2D>();
                 _thornSpear.AddComponent<TinkEffect>();
+                _thornSpear.AddComponent<TinkSound>();
                 _thornSpear.AddComponent<Rigidbody2D>().isKinematic = true;
                 BoxCollider2D thornSpearCollider = _thornSpear.GetComponent<BoxCollider2D>();
                 thornSpearCollider.size = new Vector2(1.5f, 16);
@@ -405,7 +407,7 @@ namespace Traitor_God
 
                 yield return new WaitForSeconds(0.25f);
             }
-            _control.InsertCoroutine("Thorn Spear Throw", 0, ThornSpearThrow);
+            Control.InsertCoroutine("Thorn Spear Throw", 0, ThornSpearThrow);
 
             IEnumerator ThornSpearThrowRecover()
             {
@@ -413,7 +415,7 @@ namespace Traitor_God
                 
                 yield return new WaitForSeconds(1.0f);
             }
-            _control.InsertCoroutine("Thorn Spear Throw Recover", 0, ThornSpearThrowRecover);
+            Control.InsertCoroutine("Thorn Spear Throw Recover", 0, ThornSpearThrowRecover);
 
             IEnumerator ThornSpearThrowDestroySpear()
             {
@@ -421,17 +423,17 @@ namespace Traitor_God
 
                 yield return null;
             }
-            _control.InsertCoroutine("Thorn Spear Throw Destroy Spear", 0, ThornSpearThrowDestroySpear);
+            Control.InsertCoroutine("Thorn Spear Throw Destroy Spear", 0, ThornSpearThrowDestroySpear);
             
-            _control.GetAction<SendRandomEventV2>("Attack Choice").AddToSendRandomEventV2("Thorn Spear Throw Antic", 0.33f, 1);
+            Control.GetAction<SendRandomEventV2>("Attack Choice").AddToSendRandomEventV2("Thorn Spear Throw Antic", 0.33f, 1);
         }
 
         private void AddWallFall()
         {
-            _control.CreateState("Wall Fall");
+            Control.CreateState("Wall Fall");
 
-            _control.AddTransition("DSlash", "HITWALL", "Wall Fall");
-            _control.AddTransition("Wall Fall", FsmEvent.Finished, "Land");
+            Control.AddTransition("DSlash", "HITWALL", "Wall Fall");
+            Control.AddTransition("Wall Fall", FsmEvent.Finished, "Land");
 
             IEnumerator WallFall()
             {
@@ -444,19 +446,19 @@ namespace Traitor_God
                 {
                     yield return null;
                 }
-                _control.SetState("Land");
+                Control.SetState("Land");
 
                 yield return null;
             }
             
-            _control.InsertCoroutine("Wall Fall", 0, WallFall);
+            Control.InsertCoroutine("Wall Fall", 0, WallFall);
         }
         
         private void Awake()
         {
             _anim = gameObject.GetComponent<tk2dSpriteAnimator>();
             _audio = gameObject.GetComponent<AudioSource>();
-            _control = gameObject.LocateMyFSM("Mantis");
+            Control = gameObject.LocateMyFSM("Mantis");
             _gpzControl = TraitorGod.preloadedGameObjects["GPZ"].LocateMyFSM("Control");
             _hm = gameObject.GetComponent<HealthManager>();
             _rb = gameObject.GetComponent<Rigidbody2D>();
@@ -471,40 +473,40 @@ namespace Traitor_God
         private void ChangeStateValues()
         {
             // Increase range of Slash attack
-            _control.Fsm.GetFsmFloat("Attack Speed").Value = 50.0f;
+            Control.Fsm.GetFsmFloat("Attack Speed").Value = 50.0f;
             
             // Increase vertical velocity of DSlash jump
-            _control.GetAction<SetVelocity2d>("Jump").y = 40;
+            Control.GetAction<SetVelocity2d>("Jump").y = 40;
 
             // Remove the cooldown between attacksh
-            _control.RemoveAction<Wait>("Cooldown");
-            _control.RemoveAction<Wait>("Sick Throw CD");
+            Control.RemoveAction<Wait>("Cooldown");
+            Control.RemoveAction<Wait>("Sick Throw CD");
 
             // Decrease duration of slam attack
-            _control.GetAction<Wait>("Waves").time.Value = 0.0f;
+            Control.GetAction<Wait>("Waves").time.Value = 0.0f;
 
             // Evenly distribute Slash and DSlash attacks and raise max attack repeats
-            _control.GetAction<SendRandomEventV2>("Attack Choice").weights[0].Value = 0.33f;    // Slash weight
-            _control.GetAction<SendRandomEventV2>("Attack Choice").weights[1].Value = 0.33f;    // DSlash weight
-            _control.GetAction<SendRandomEventV2>("Attack Choice").eventMax[0].Value = 4;      // Slash max repeats
-            _control.GetAction<SendRandomEventV2>("Attack Choice").eventMax[1].Value = 4;      // DSlash max repeats
+            Control.GetAction<SendRandomEventV2>("Attack Choice").weights[0].Value = 0.33f;    // Slash weight
+            Control.GetAction<SendRandomEventV2>("Attack Choice").weights[1].Value = 0.33f;    // DSlash weight
+            Control.GetAction<SendRandomEventV2>("Attack Choice").eventMax[0].Value = 4;      // Slash max repeats
+            Control.GetAction<SendRandomEventV2>("Attack Choice").eventMax[1].Value = 4;      // DSlash max repeats
 
             // Double the speed of the waves created by slam attack
-            _control.GetAction<SetVelocity2d>("Waves", 2).x = 24; // Right Wave
-            _control.GetAction<SetVelocity2d>("Waves", 7).x = -24; // Left Wave
+            Control.GetAction<SetVelocity2d>("Waves", 2).x = 24; // Right Wave
+            Control.GetAction<SetVelocity2d>("Waves", 7).x = -24; // Left Wave
 
             // Traitor God can perform slam attack at 2/3 health
-            _control.GetAction<IntCompare>("Slam?").integer2 = Phase2Health + Phase3Health;
+            Control.GetAction<IntCompare>("Slam?").integer2 = Phase2Health + Phase3Health;
 
             // Make Traitor God back up for the slam at a further distance to compensate for faster waves
-            _control.GetAction<FloatCompare>("Too Close?").float2 = 15.0f;
+            Control.GetAction<FloatCompare>("Too Close?").float2 = 15.0f;
 
             // Set contact damage to 2
-            _control.GetAction<SetDamageHeroAmount>("Land").damageDealt = 2;
-            _control.GetAction<SetDamageHeroAmount>("Attack Recover").damageDealt = 2;
+            Control.GetAction<SetDamageHeroAmount>("Land").damageDealt = 2;
+            Control.GetAction<SetDamageHeroAmount>("Attack Recover").damageDealt = 2;
             
             // Fall into the arena faster
-            _control.GetAction<SetVelocity2d>("Fall").y = -60;
+            Control.GetAction<SetVelocity2d>("Fall").y = -60;
         }
         
         /* Change wave sprite sheet using index of TraitorGod.SPRITES variable */
@@ -512,7 +514,7 @@ namespace Traitor_God
         {
             Vector3 position = Vector3.zero;
             Quaternion rotation = Quaternion.Euler(position);
-            GameObject wave = Instantiate(_control.GetAction<SpawnObjectFromGlobalPool>("Waves").gameObject.Value,
+            GameObject wave = Instantiate(Control.GetAction<SpawnObjectFromGlobalPool>("Waves").gameObject.Value,
                 position, rotation);
             // slash_core is the child GameObject containing the wave's SpriteRenderer
             GameObject slashCore = wave.FindGameObjectInChildren("slash_core");
@@ -546,22 +548,22 @@ namespace Traitor_God
         {
             Vector2 dSlashVector = GetVectorToPlayer() * _dSlashSpeed;;
 
-            _control.GetAction<SetVelocity2d>("DSlash").x = dSlashVector.x;
-            _control.GetAction<SetVelocity2d>("DSlash").y = dSlashVector.y;
+            Control.GetAction<SetVelocity2d>("DSlash").x = dSlashVector.x;
+            Control.GetAction<SetVelocity2d>("DSlash").y = dSlashVector.y;
         }
 
         private void GetAudioClips()
         {
-            _dSlashAudio = _control.GetAction<AudioPlayerOneShot>("DSlash").audioClips[0];
-            _jumpAnticAudio = _control.GetAction<AudioPlayerOneShot>("Jump Antic").audioClips[0];
-            _jumpAudio = _control.GetAction<AudioPlayerOneShot>("Jump").audioClips[0];
-            _landAudio = _control.GetAction<AudioPlayerOneShot>("Land").audioClips[0];
-            _roarAudio = _control.GetAction<AudioPlayerOneShot>("Roar").audioClips[0];
-            _slamAudio = (AudioClip)_control.GetAction<AudioPlayerOneShotSingle>("Slamming").audioClip.Value;
-            _slashAnticAudio = _control.GetAction<AudioPlayerOneShot>("Attack Antic").audioClips[0];
-            _slashAudio = _control.GetAction<AudioPlayerOneShot>("Attack 1").audioClips[0];
+            _dSlashAudio = Control.GetAction<AudioPlayerOneShot>("DSlash").audioClips[0];
+            _jumpAnticAudio = Control.GetAction<AudioPlayerOneShot>("Jump Antic").audioClips[0];
+            _jumpAudio = Control.GetAction<AudioPlayerOneShot>("Jump").audioClips[0];
+            _landAudio = Control.GetAction<AudioPlayerOneShot>("Land").audioClips[0];
+            _roarAudio = Control.GetAction<AudioPlayerOneShot>("Roar").audioClips[0];
+            _slamAudio = (AudioClip)Control.GetAction<AudioPlayerOneShotSingle>("Slamming").audioClip.Value;
+            _slashAnticAudio = Control.GetAction<AudioPlayerOneShot>("Attack Antic").audioClips[0];
+            _slashAudio = Control.GetAction<AudioPlayerOneShot>("Attack 1").audioClips[0];
         }
-        
+
         private Vector2 GetVectorToPlayer()
         {
             _heroPos = HeroController.instance.transform.position;
@@ -595,9 +597,12 @@ namespace Traitor_God
                     shockFSM.FsmVariables.FindFsmBool("Facing Right").Value = @bool;
                     shockFSM.FsmVariables.FindFsmFloat("Speed").Value = speed;
                     shockwave.AddComponent<DamageHero>().damageDealt = damage;
+                    shockwave.AddComponent<DebugColliders>();
+                    GameObject plane = shockwave.FindGameObjectInChildren("Plane");
+
+                    plane.GetComponent<MeshRenderer>().material.mainTexture = TraitorGod.SPRITES[1].texture;
                     shockwave.SetActive(true);
                     shockwave.transform.SetPosition2D(new Vector2(pos.x, 28.1f));
-                    shockwave.PrintSceneHierarchyTree();
                 }
             };
         }
@@ -616,7 +621,7 @@ namespace Traitor_God
 
                 foreach (float sicklePosY in sicklePositionYs)
                 {
-                    GameObject sickle = Instantiate(_control
+                    GameObject sickle = Instantiate(Control
                         .GetAction<SpawnObjectFromGlobalPool>("Sickle Throw")
                         .gameObject.Value, pos.SetY(sicklePosY), angle);
                         
@@ -637,7 +642,7 @@ namespace Traitor_God
             
             foreach (float velocity in velocities)
             {
-                GameObject wave = Instantiate(_control.GetAction<SpawnObjectFromGlobalPool>("Waves", 0).gameObject.Value, spawnPos, rot);
+                GameObject wave = Instantiate(Control.GetAction<SpawnObjectFromGlobalPool>("Waves", 0).gameObject.Value, spawnPos, rot);
                 wave.GetComponent<Rigidbody2D>().velocity = new Vector2(velocity, 0);
                 GameObject slashCore = wave.FindGameObjectInChildren("slash_core");
                 slashCore.GetComponent<SpriteRenderer>().flipX = (velocity < 0);
@@ -677,20 +682,20 @@ namespace Traitor_God
                 _trail = AddTrail(gameObject, 1.8f, infectionOrange);
 
             // Disable empty walks
-            _control.RemoveTransition("Feint?", "Feint");
+            Control.RemoveTransition("Feint?", "Feint");
 
             // Disable slam repeat
-            _control.RemoveTransition("Check L", "Repeat?");
-            _control.RemoveTransition("Check R", "Repeat?");
-            _control.RemoveTransition("Repeat?", "Repeat");
-            _control.RemoveTransition("Repeat", "Too Close?");
+            Control.RemoveTransition("Check L", "Repeat?");
+            Control.RemoveTransition("Check R", "Repeat?");
+            Control.RemoveTransition("Repeat?", "Repeat");
+            Control.RemoveTransition("Repeat", "Too Close?");
 
             // Summon two sickles when slashing
-            _control.InsertMethod("Attack Swipe", 0, SpawnSickles(40f));
+            Control.InsertMethod("Attack Swipe", 0, SpawnSickles(40f));
             // Target the player during DSlash
-            _control.InsertMethod("DSlash Antic", 0, DSlashTargetPlayer);
+            Control.InsertMethod("DSlash Antic", 0, DSlashTargetPlayer);
             // Spawn shockwaves when landing after a DSlash
-            _control.InsertMethod("Land", 0, SpawnShockwaves(1, 1f, 25, 2));
+            Control.InsertMethod("Land", 0, SpawnShockwaves(1, 1f, 25, 2));
 
             // Loop DSlash animation
             _anim.GetClipByName("DSlash").wrapMode = tk2dSpriteAnimationClip.WrapMode.Loop;
@@ -732,9 +737,9 @@ namespace Traitor_God
          encounters a wall or roof, and is off the ground */
         private void OnCollisionEnter2D(Collision2D collision)
         {
-            if (_control.ActiveStateName == "DSlash" && collision.collider.gameObject.layer == 8 && transform.position.y > 31.6)
+            if (Control.ActiveStateName == "DSlash" && collision.collider.gameObject.layer == 8 && transform.position.y > 31.6)
             {
-                _control.SetState("Wall Fall");
+                Control.SetState("Wall Fall");
             }
         }
         
