@@ -13,6 +13,8 @@ using Fsm = On.HutongGames.PlayMaker.Fsm;
 using Random = System.Random;
 using USceneManager = UnityEngine.SceneManagement.SceneManager;
 
+// Taken and modified from https://github.com/SalehAce1/PaleChampion/blob/master/PaleChampion/PaleChampion/TinkSound.cs
+
 namespace Traitor_God
 {
     public class TinkSound : MonoBehaviour

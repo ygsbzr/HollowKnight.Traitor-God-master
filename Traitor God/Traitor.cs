@@ -84,6 +84,7 @@ namespace Traitor_God
 
             IEnumerator DoubleSlamWaves1()
             {
+                _audio.PlayOneShot(_slamAudio);
                 SpawnWaves(12, 3);
 
                 yield return new WaitForSeconds(0.5f);
@@ -228,7 +229,7 @@ namespace Traitor_God
 
                 void SpawnThorns(string preloadedObjectName, Vector2 colliderSize, Vector3 position)
                 {
-                    GameObject thorns = Instantiate(TraitorGod.preloadedGameObjects[preloadedObjectName]);
+                    GameObject thorns = Instantiate(TraitorGod.PreloadedGameObjects[preloadedObjectName]);
                     thorns.SetActive(true);
                     thorns.layer = 17;
                     thorns.AddComponent<BoxCollider2D>();
@@ -329,6 +330,7 @@ namespace Traitor_God
             Control.GetAction<SendRandomEventV2>("Slam?").AddToSendRandomEventV2("ThornPillars Appear", 0.15f, 1);
         }
         
+        float _angle;
         GameObject _thornSpear;
         private void AddThornSpearThrow()
         {
@@ -341,7 +343,9 @@ namespace Traitor_God
             };
             
             Control.CreateStates(states);
-            
+
+            Vector2 vectorToTarget = new Vector2(0, 0);
+
             IEnumerator ThornSpearThrowAntic()
             {
                 _anim.Play("Sickle Throw Antic");
@@ -349,34 +353,36 @@ namespace Traitor_God
                 _audio.PlayOneShot(_slashAnticAudio);
                 _rb.velocity = new Vector2(0, 0);
                 
+                vectorToTarget = GetVectorToPlayer();
+                _angle = (float)Math.Atan2(vectorToTarget.y, vectorToTarget.x) * Mathf.Rad2Deg + 90;
+                
                 yield return new WaitForSeconds(1.0f);
             }
             Control.InsertCoroutine("Thorn Spear Throw Antic", 0, ThornSpearThrowAntic);
-
+            
             IEnumerator ThornSpearThrow()
             {
                 _anim.Play("Sickle Throw Attack");
-                
+
+                Vector2 pos = transform.position;
+                Log("Angle: " + _angle);
+                Quaternion rot = Quaternion.Euler(0, 0, _angle);
+
                 /* Thorn Spear */
-                _thornSpear = Instantiate(TraitorGod.preloadedGameObjects["ThornSpear"]);
-                _thornSpear.GetComponent<SpriteRenderer>().sprite = TraitorGod.SPRITES[2];
+                _thornSpear = Instantiate(TraitorGod.PreloadedGameObjects["ThornSpear"], pos, rot);
+                _thornSpear.GetComponent<SpriteRenderer>().sprite = TraitorGod.Sprites[2];
                 _thornSpear.SetActive(true);
                 _thornSpear.layer = 11;
                 _thornSpear.AddComponent<BoxCollider2D>();
+                _thornSpear.AddComponent<DebugColliders>();
                 _thornSpear.AddComponent<TinkEffect>();
                 _thornSpear.AddComponent<TinkSound>();
                 _thornSpear.AddComponent<Rigidbody2D>().isKinematic = true;
                 BoxCollider2D thornSpearCollider = _thornSpear.GetComponent<BoxCollider2D>();
-                thornSpearCollider.size = new Vector2(1.5f, 16);
+                thornSpearCollider.size = new Vector2(1, 12);
                 _thornSpear.AddComponent<DamageHero>().damageDealt = 2;
                 _thornSpear.AddComponent<NonBouncer>();
-                _thornSpear.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
-                Transform trans = transform;
-                Vector2 pos = trans.position;
-                Vector2 scale = trans.localScale;
-                _thornSpear.transform.position = new Vector2(pos.x, pos.y - 2F);
-                _thornSpear.transform.rotation = Quaternion.Euler(0, 0, Math.Sign(scale.x) * 90);
-                _thornSpear.GetComponent<Rigidbody2D>().velocity = new Vector2(Math.Sign(scale.x) * 75, 0);
+                _thornSpear.GetComponent<Rigidbody2D>().velocity = new Vector2(vectorToTarget.x, vectorToTarget.y) * 75;
 
                 /* Particle Trail */
                 ParticleSystem ps = _thornSpear.AddComponent<ParticleSystem>();
@@ -459,7 +465,7 @@ namespace Traitor_God
             _anim = gameObject.GetComponent<tk2dSpriteAnimator>();
             _audio = gameObject.GetComponent<AudioSource>();
             Control = gameObject.LocateMyFSM("Mantis");
-            _gpzControl = TraitorGod.preloadedGameObjects["GPZ"].LocateMyFSM("Control");
+            _gpzControl = TraitorGod.PreloadedGameObjects["GPZ"].LocateMyFSM("Control");
             _hm = gameObject.GetComponent<HealthManager>();
             _rb = gameObject.GetComponent<Rigidbody2D>();
             
@@ -518,7 +524,7 @@ namespace Traitor_God
                 position, rotation);
             // slash_core is the child GameObject containing the wave's SpriteRenderer
             GameObject slashCore = wave.FindGameObjectInChildren("slash_core");
-            byte[] spriteSheetByteData = TraitorGod.SPRITEBYTES[spriteIndex];
+            byte[] spriteSheetByteData = TraitorGod.SpriteBytes[spriteIndex];
             slashCore.GetComponent<SpriteRenderer>().sprite.texture.LoadImage(spriteSheetByteData);
             Destroy(wave);
         }
@@ -597,10 +603,9 @@ namespace Traitor_God
                     shockFSM.FsmVariables.FindFsmBool("Facing Right").Value = @bool;
                     shockFSM.FsmVariables.FindFsmFloat("Speed").Value = speed;
                     shockwave.AddComponent<DamageHero>().damageDealt = damage;
-                    shockwave.AddComponent<DebugColliders>();
                     GameObject plane = shockwave.FindGameObjectInChildren("Plane");
 
-                    plane.GetComponent<MeshRenderer>().material.mainTexture = TraitorGod.SPRITES[1].texture;
+                    plane.GetComponent<MeshRenderer>().material.mainTexture = TraitorGod.Sprites[1].texture;
                     shockwave.SetActive(true);
                     shockwave.transform.SetPosition2D(new Vector2(pos.x, 28.1f));
                 }
@@ -659,7 +664,7 @@ namespace Traitor_God
 
         private void ResetOldValues()
         {
-            gameObject.GetComponent<tk2dSprite>().GetCurrentSpriteDef().material.mainTexture = TraitorGod.SPRITES[3].texture;
+            gameObject.GetComponent<tk2dSprite>().GetCurrentSpriteDef().material.mainTexture = TraitorGod.Sprites[3].texture;
             ChangeWaveSprite(4);
         }
 
@@ -706,7 +711,7 @@ namespace Traitor_God
             Log("Changing to New Sprites");
             // Change sprites using Mola's Traitor God sprite sheet
             gameObject.GetComponent<tk2dSprite>().GetCurrentSpriteDef().material.mainTexture =
-                TraitorGod.SPRITES[0].texture;
+                TraitorGod.Sprites[0].texture;
             ColorizeSlamWaves();
 
             GetAudioClips();

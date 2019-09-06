@@ -20,20 +20,20 @@ namespace Traitor_God
     public class TraitorGod : Mod<SaveSettings>, ITogglableMod
     {
         
-        public static readonly List<Sprite> SPRITES = new List<Sprite>();
-        public static readonly List<byte[]> SPRITEBYTES = new List<byte[]>();
+        public static readonly List<Sprite> Sprites = new List<Sprite>();
+        public static readonly List<byte[]> SpriteBytes = new List<byte[]>();
         
         [PublicAPI]
         public static TraitorGod Instance { get; private set; }
 
-        public static Dictionary<string, GameObject> preloadedGameObjects = new Dictionary<string, GameObject>();
+        public static readonly Dictionary<string, GameObject> PreloadedGameObjects = new Dictionary<string, GameObject>();
         
         public override string GetVersion()
         {
             return Assembly.GetAssembly(typeof(TraitorGod)).GetName().Version.ToString();
         }
 
-        private string _lastScene;
+        private string _previousScene;
 
         public override List<(string, string)> GetPreloadNames()
         {
@@ -50,12 +50,12 @@ namespace Traitor_God
         public override void Initialize(Dictionary<string, Dictionary<string, GameObject>> preloadedObjects)
         {
             Log("Storing GameObjects");
-            preloadedGameObjects.Add("GPZ", preloadedObjects["GG_Grey_Prince_Zote"]["Grey Prince"]);
-            preloadedGameObjects.Add("ThornsL", preloadedObjects["Fungus3_11"]["fungd_spikes_09_FG 7"]);
-            preloadedGameObjects.Add("ThornsR", preloadedObjects["Fungus3_11"]["fungd_spikes_09_FG"]);
-            preloadedGameObjects.Add("BlackThorns", preloadedObjects["Fungus3_11"]["fungd_spike_sil_04"]);
-            preloadedGameObjects.Add("ThornPoint", preloadedObjects["GG_Ghost_No_Eyes_V"]["fungd_spikes_0_0001_d"]);
-            preloadedGameObjects.Add("ThornSpear", preloadedObjects["GG_Ghost_No_Eyes_V"]["fungd_spikes_0_0001_d"]);
+            PreloadedGameObjects.Add("GPZ", preloadedObjects["GG_Grey_Prince_Zote"]["Grey Prince"]);
+            PreloadedGameObjects.Add("ThornsL", preloadedObjects["Fungus3_11"]["fungd_spikes_09_FG 7"]);
+            PreloadedGameObjects.Add("ThornsR", preloadedObjects["Fungus3_11"]["fungd_spikes_09_FG"]);
+            PreloadedGameObjects.Add("BlackThorns", preloadedObjects["Fungus3_11"]["fungd_spike_sil_04"]);
+            PreloadedGameObjects.Add("ThornPoint", preloadedObjects["GG_Ghost_No_Eyes_V"]["fungd_spikes_0_0001_d"]);
+            PreloadedGameObjects.Add("ThornSpear", preloadedObjects["GG_Ghost_No_Eyes_V"]["fungd_spikes_0_0001_d"]);
 
             Instance = this;
             
@@ -94,8 +94,8 @@ namespace Traitor_God
                     var texture = new Texture2D(1, 1);
                     texture.LoadImage(buffer, true);
                     // Create sprite from texture
-                    SPRITEBYTES.Add(buffer);
-                    SPRITES.Add(Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f)));
+                    SpriteBytes.Add(buffer);
+                    Sprites.Add(Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f)));
 
                     Log("Created sprite from embedded image: " + resource + " at index " + index);
                     index++;
@@ -119,9 +119,9 @@ namespace Traitor_God
                 : orig;
         }
 
-        private void SceneChanged(Scene arg0, Scene arg1)
+        private void SceneChanged(Scene previousScene, Scene currentScene)
         {
-            _lastScene = arg0.name;
+            _previousScene = previousScene.name;
         }
 
         private string OnLangGet(string key, string sheettitle)
@@ -135,9 +135,9 @@ namespace Traitor_God
             {
                 case "Traitor_Name":
                     return "Traitor God";
-                case "TRAITOR_LORD_MAIN" when _lastScene == "GG_Workshop" && PlayerData.instance.statueStateTraitorLord.usingAltVersion:
+                case "TRAITOR_LORD_MAIN" when _previousScene == "GG_Workshop" && PlayerData.instance.statueStateTraitorLord.usingAltVersion:
                     return "Traitor";
-                case "TRAITOR_LORD_SUB" when _lastScene == "GG_Workshop" && PlayerData.instance.statueStateTraitorLord.usingAltVersion:
+                case "TRAITOR_LORD_SUB" when _previousScene == "GG_Workshop" && PlayerData.instance.statueStateTraitorLord.usingAltVersion:
                     return "God";
                 case "Traitor_Desc":
                     return "Renegade god of fury";
