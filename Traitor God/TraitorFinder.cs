@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Reflection;
-using HutongGames.PlayMaker.Actions;
-using JetBrains.Annotations;
 using ModCommon;
-using ModCommon.Util;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using Bounds = UnityEngine.Bounds;
 using Logger = Modding.Logger;
 using USceneManager = UnityEngine.SceneManagement.SceneManager;
 
@@ -22,17 +17,23 @@ namespace Traitor_God
             USceneManager.activeSceneChanged += SceneChanged;
         }
 
-        private void SceneChanged(Scene previousScene, Scene currentScene)
+        private void SceneChanged(Scene previousScene, Scene currentScene) => StartCoroutine(SceneChangedRoutine(previousScene, currentScene));
+        
+        private IEnumerator SceneChangedRoutine(Scene prev, Scene next)
         {
-            if (currentScene.name == "GG_Workshop") SetStatue();
-            if (currentScene.name != "GG_Traitor_Lord") return;
-            if (previousScene.name != "GG_Workshop") return;
+            yield return null;
+            
+            if (next.name == "GG_Workshop") SetStatue();
+            if (next.name != "GG_Traitor_Lord") yield break;
+            if (prev.name != "GG_Workshop") yield break;
 
             StartCoroutine(AddComponent());
         }
 
         private void SetStatue()
         {
+            Log("Setting up statues...");
+
             GameObject statue = GameObject.Find("GG_Statue_TraitorLord");
 
             BossScene scene = ScriptableObject.CreateInstance<BossScene>();
@@ -41,6 +42,24 @@ namespace Traitor_God
             BossStatue bs = statue.GetComponent<BossStatue>();
             bs.dreamBossScene = scene;
             bs.dreamStatueStatePD = "statueStateTraitor";
+
+            Destroy(statue.FindGameObjectInChildren("StatueAlt"));
+
+            GameObject displayStatue = bs.statueDisplay;
+
+            GameObject alt = Instantiate
+            (
+                displayStatue,
+                displayStatue.transform.parent,
+                true
+            );
+
+            // FUCK local rotation
+            alt.GetComponentInChildren<SpriteRenderer>(true).flipX = true;
+
+            alt.name = "StatueAlt";
+
+            bs.statueDisplayAlt = alt;
 
             BossStatue.BossUIDetails details = new BossStatue.BossUIDetails();
             details.nameKey = details.nameSheet = "Traitor_Name";
@@ -57,24 +76,27 @@ namespace Traitor_God
             GameObject switchLever = altLever.FindGameObjectInChildren("GG_statue_switch_lever");
             switchLever.SetActive(true);
 
-            GameObject statueDisplayAlt = bs.statueDisplayAlt;
-            statueDisplayAlt.SetActive(true);
-
-            Vector3 pos = new Vector3(188.5f, 9.6f, 0.9f);
-            
-            GameObject ggStatue = statue.FindGameObjectInChildren("GG_statues_0006_5");
-            Sprite traitorLordStatueSprite = ggStatue.GetComponent<SpriteRenderer>().sprite;
-            SpriteRenderer spriteRenderer = statueDisplayAlt.AddComponent<SpriteRenderer>();
-            Sprite sprite = spriteRenderer.sprite = traitorLordStatueSprite;
-            statueDisplayAlt.transform.localPosition = new Vector3(0.3f, 3.2f, 0.0f);
-            statueDisplayAlt.transform.localRotation = Quaternion.Euler(0, 180, 0);
-
-            GameObject baseStatue = statue.FindGameObjectInChildren("Statue");
-            GameObject statueAlt = statue.FindGameObjectInChildren("StatueAlt");
-
             BossStatueLever toggle = statue.GetComponentInChildren<BossStatueLever>();
             toggle.SetOwner(bs);
             toggle.SetState(true);
+
+            bs.OnStatueSwapFinished += () =>
+            {
+                if (bs.UsingDreamVersion)
+                {
+                    StartCoroutine(RaiseStatue(alt));
+                }
+            };
+        }
+
+        private IEnumerator RaiseStatue(GameObject alt)
+        {
+            for (int i = 0; i < 50; i++)
+            {
+                alt.transform.position += new Vector3(0, .0195f);
+                
+                yield return new WaitForSeconds(0.002f);
+            }
         }
 
         private static IEnumerator AddComponent()
