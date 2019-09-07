@@ -42,6 +42,8 @@ namespace Traitor_God
             BossStatue bs = statue.GetComponent<BossStatue>();
             bs.dreamBossScene = scene;
             bs.dreamStatueStatePD = "statueStateTraitor";
+            
+            bs.SetPlaquesVisible(bs.StatueState.isUnlocked && bs.StatueState.hasBeenSeen || bs.isAlwaysUnlocked);
 
             Destroy(statue.FindGameObjectInChildren("StatueAlt"));
 
