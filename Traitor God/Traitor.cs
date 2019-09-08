@@ -10,6 +10,7 @@ using Modding;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Fsm = On.HutongGames.PlayMaker.Fsm;
+using Logger = Modding.Logger;
 using Random = System.Random;
 using USceneManager = UnityEngine.SceneManagement.SceneManager;
 
@@ -469,8 +470,11 @@ namespace Traitor_God
             _hm = gameObject.GetComponent<HealthManager>();
             _rb = gameObject.GetComponent<Rigidbody2D>();
             
+            Log("Using alt version: " + PlayerData.instance.statueStateTraitorLord.usingAltVersion);
+            Log("Using alt version2: " + PlayerData.instance.GetVariable<BossStatue.Completion>("statueStateTraitor").usingAltVersion);
             if (PlayerData.instance.statueStateTraitorLord.usingAltVersion)
             {
+                
                 _hm.hp = TotalHealth;
                 _hm.OnDeath += DeathHandler;
             }

@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using Modding;
-using ModCommon;
-using MonoMod.RuntimeDetour;
 using JetBrains.Annotations;
 using UnityEngine;
 using UnityEngine.SceneManagement;
