@@ -17,15 +17,21 @@ namespace Traitor_God
             USceneManager.activeSceneChanged += SceneChanged;
         }
 
-        private void SceneChanged(Scene previousScene, Scene currentScene) => StartCoroutine(SceneChangedRoutine(previousScene, currentScene));
-        
-        private IEnumerator SceneChangedRoutine(Scene prev, Scene next)
+        private void SceneChanged(Scene previousScene, Scene currentScene)
+        {
+            // Passing the strings instead of the Scenes because that's all we use and
+            // Unity kills the prev scene's name after <1 frame
+            StartCoroutine(SceneChangedRoutine(previousScene.name, currentScene.name));
+        }
+
+        private IEnumerator SceneChangedRoutine(string prev, string next)
         {
             yield return null;
             
-            if (next.name == "GG_Workshop") SetStatue();
-            if (next.name != "GG_Traitor_Lord") yield break;
-            if (prev.name != "GG_Workshop") yield break;
+            if (next == "GG_Workshop") SetStatue();
+            
+            if (next != "GG_Traitor_Lord") yield break;
+            if (prev != "GG_Workshop") yield break;
 
             StartCoroutine(AddComponent());
         }
@@ -55,6 +61,8 @@ namespace Traitor_God
                 displayStatue.transform.parent,
                 true
             );
+
+            alt.SetActive(bs.UsingDreamVersion);
 
             // FUCK local rotation
             alt.GetComponentInChildren<SpriteRenderer>(true).flipX = true;
@@ -91,7 +99,7 @@ namespace Traitor_God
             };
         }
 
-        private IEnumerator RaiseStatue(GameObject alt)
+        private static IEnumerator RaiseStatue(GameObject alt)
         {
             for (int i = 0; i < 50; i++)
             {
