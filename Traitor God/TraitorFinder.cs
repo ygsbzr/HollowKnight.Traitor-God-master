@@ -19,8 +19,8 @@ namespace Traitor_God
 
         private void SceneChanged(Scene previousScene, Scene currentScene)
         {
-            // Passing the strings instead of the Scenes because that's all we use and
-            // Unity kills the prev scene's name after <1 frame
+            /* Passing the strings instead of the Scenes because that's all we use and
+             Unity kills the prev scene's name after <1 frame */
             StartCoroutine(SceneChangedRoutine(previousScene.name, currentScene.name));
         }
 
@@ -48,7 +48,9 @@ namespace Traitor_God
             BossStatue bs = statue.GetComponent<BossStatue>();
             bs.dreamBossScene = scene;
             bs.dreamStatueStatePD = "statueStateTraitor";
-            
+
+            /* 56's code */
+
             bs.SetPlaquesVisible(bs.StatueState.isUnlocked && bs.StatueState.hasBeenSeen || bs.isAlwaysUnlocked);
 
             Destroy(statue.FindGameObjectInChildren("StatueAlt"));
@@ -61,15 +63,12 @@ namespace Traitor_God
                 displayStatue.transform.parent,
                 true
             );
-
             alt.SetActive(bs.UsingDreamVersion);
-
-            // FUCK local rotation
             alt.GetComponentInChildren<SpriteRenderer>(true).flipX = true;
-
             alt.name = "StatueAlt";
-
             bs.statueDisplayAlt = alt;
+
+            /* 56's code */
 
             BossStatue.BossUIDetails details = new BossStatue.BossUIDetails();
             details.nameKey = details.nameSheet = "Traitor_Name";
@@ -89,24 +88,6 @@ namespace Traitor_God
             BossStatueLever toggle = statue.GetComponentInChildren<BossStatueLever>();
             toggle.SetOwner(bs);
             toggle.SetState(true);
-
-            bs.OnStatueSwapFinished += () =>
-            {
-                if (bs.UsingDreamVersion)
-                {
-                    StartCoroutine(RaiseStatue(alt));
-                }
-            };
-        }
-
-        private static IEnumerator RaiseStatue(GameObject alt)
-        {
-            for (int i = 0; i < 50; i++)
-            {
-                alt.transform.position += new Vector3(0, .0195f);
-                
-                yield return new WaitForSeconds(0.002f);
-            }
         }
 
         private static IEnumerator AddComponent()

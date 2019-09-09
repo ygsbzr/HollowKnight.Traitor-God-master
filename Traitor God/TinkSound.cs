@@ -1,17 +1,5 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using HutongGames.PlayMaker;
-using HutongGames.PlayMaker.Actions;
-using ModCommon;
-using ModCommon.Util;
-using Modding;
+﻿using HutongGames.PlayMaker.Actions;
 using UnityEngine;
-using UnityEngine.SceneManagement;
-using Fsm = On.HutongGames.PlayMaker.Fsm;
-using Random = System.Random;
-using USceneManager = UnityEngine.SceneManagement.SceneManager;
 
 // Taken and modified from https://github.com/SalehAce1/PaleChampion/blob/master/PaleChampion/PaleChampion/TinkSound.cs
 

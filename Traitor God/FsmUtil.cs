@@ -432,6 +432,7 @@ namespace Traitor_God
             return state;
         }
 
+        /* Helper method specifically for creating a series of states leading to a final "Idle" state */
         public static void CreateStates(this PlayMakerFSM fsm, string[] stateNames)
         {
             for (int i = 0; i < stateNames.Length; i++)

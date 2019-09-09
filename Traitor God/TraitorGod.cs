@@ -52,7 +52,7 @@ namespace Traitor_God
             PreloadedGameObjects.Add("ThornsR", preloadedObjects["Fungus3_11"]["fungd_spikes_09_FG"]);
             PreloadedGameObjects.Add("BlackThorns", preloadedObjects["Fungus3_11"]["fungd_spike_sil_04"]);
             PreloadedGameObjects.Add("ThornPoint", preloadedObjects["GG_Ghost_No_Eyes_V"]["fungd_spikes_0_0001_d"]);
-            PreloadedGameObjects.Add("ThornSpear", preloadedObjects["GG_Ghost_No_Eyes_V"]["fungd_spikes_0_0001_d"]);
+            PreloadedGameObjects.Add("Spear", preloadedObjects["GG_Ghost_No_Eyes_V"]["fungd_spikes_0_0001_d"]);
 
             Instance = this;
             
