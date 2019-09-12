@@ -159,7 +159,7 @@ namespace Traitor_God
                 {
                     Log("Entered Phase 3");
                     _enteredPhase3 = true;
-                    AddSpearThrow();
+                    AddTriSpearThrow();
                     AddThornPillars();
                 }
             }
@@ -581,20 +581,20 @@ namespace Traitor_God
 
         /* Throw vine-wrapped mantis spear */
         float[] _angles;
-        private void AddSpearThrow()
+        private void AddTriSpearThrow()
         {
             string[] states =
             {
-                "Spear Throw Antic",
-                "Spear Throw",
-                "Spear Throw Recover",
+                "Tri-Spear Throw Antic",
+                "Tri-Spear Throw",
+                "Tri-Spear Throw Recover",
             };
 
             Control.CreateStates(states);
 
             Vector2 vectorToTarget = new Vector2();
 
-            IEnumerator SpearThrowAntic()
+            IEnumerator TriSpearThrowAntic()
             {
                 _anim.Play("Sickle Throw Antic");
                 _audio.pitch = 0.9f;
@@ -631,9 +631,9 @@ namespace Traitor_God
 
                 yield return new WaitForSeconds(1.0f);
             }
-            Control.InsertCoroutine("Spear Throw Antic", 0, SpearThrowAntic);
+            Control.InsertCoroutine("Tri-Spear Throw Antic", 0, TriSpearThrowAntic);
 
-            IEnumerator SpearThrow()
+            IEnumerator TriSpearThrow()
             {
                 _anim.Play("Sickle Throw Attack");
 
@@ -667,17 +667,17 @@ namespace Traitor_God
 
                 yield return new WaitForSeconds(0.25f);
             }
-            Control.InsertCoroutine("Spear Throw", 0, SpearThrow);
+            Control.InsertCoroutine("Tri-Spear Throw", 0, TriSpearThrow);
 
-            IEnumerator SpearThrowRecover()
+            IEnumerator TriSpearThrowRecover()
             {
                 _anim.Play("Attack Recover");
 
                 yield return new WaitForSeconds(1.0f);
             }
-            Control.InsertCoroutine("Spear Throw Recover", 0, SpearThrowRecover);
+            Control.InsertCoroutine("Tri-Spear Throw Recover", 0, TriSpearThrowRecover);
 
-            Control.GetAction<SendRandomEventV2>("Attack Choice").AddToSendRandomEventV2("Spear Throw Antic", 0.33f, 1);
+            Control.GetAction<SendRandomEventV2>("Attack Choice").AddToSendRandomEventV2("Tri-Spear Throw Antic", 0.33f, 1);
         }
 
         /* AOE thorn pillars */
