@@ -49,7 +49,7 @@ namespace Traitor_God
             bs.dreamBossScene = scene;
             bs.dreamStatueStatePD = "statueStateTraitor";
 
-            /* 56's code */
+            /* 56's code { */
 
             bs.SetPlaquesVisible(bs.StatueState.isUnlocked && bs.StatueState.hasBeenSeen || bs.isAlwaysUnlocked);
 
@@ -68,7 +68,7 @@ namespace Traitor_God
             alt.name = "StatueAlt";
             bs.statueDisplayAlt = alt;
 
-            /* 56's code */
+            /* } 56's code */
 
             BossStatue.BossUIDetails details = new BossStatue.BossUIDetails();
             details.nameKey = details.nameSheet = "Traitor_Name";
