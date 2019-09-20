@@ -11,7 +11,10 @@ namespace Traitor_God
         private static readonly float yFloor = 31.6f;
 
         /* Fall down when encountering wall or ceiling */
-        public static void AddWallFall(PlayMakerFSM fsm, tk2dSpriteAnimator anim, Rigidbody2D rb, Transform trans)
+        public static void AddWallFall(PlayMakerFSM fsm, 
+                                       tk2dSpriteAnimator anim, 
+                                       Rigidbody2D rb, 
+                                       Transform trans)
         {
             fsm.CreateState("Wall Fall");
 
@@ -20,8 +23,8 @@ namespace Traitor_God
 
             IEnumerator WallFall()
             {
-                Traitor.Anim.Play("Enter");
-                Traitor.Rb.velocity = Vector2.down * wallFallVelocity;
+                anim.Play("Enter");
+                rb.velocity = Vector2.down * wallFallVelocity;
 
                 while (trans.position.y > yFloor)
                 {
@@ -35,6 +38,6 @@ namespace Traitor_God
             fsm.InsertCoroutine("Wall Fall", 0, WallFall);
         }
 
-        private static void Log(object message) => TraitorFinder.Log(message);
+        private static void Log(object message) => Modding.Logger.Log($"[Wall Fall]: " + message);
     }
 }

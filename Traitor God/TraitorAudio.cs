@@ -34,6 +34,6 @@ namespace Traitor_God
             Traitor.Audio.PlayOneShot(audioClip);
         }
 
-        private static void Log(object message) => TraitorFinder.Log(message);
+        private static void Log(object message) => Modding.Logger.Log($"[Traitor Audio]: " + message);
     }
 }

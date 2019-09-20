@@ -35,16 +35,16 @@ namespace Traitor_God
                 case 1:
                     HeroController.instance.RecoilDown();
                     position = new Vector3(position.x, position.y + 2, 0.002f);
-                    euler = new Vector3(0, 0, 90);
+                    euler = Vector3.forward * 90;
                     break;
                 case 2:
                     HeroController.instance.RecoilRight();
                     position = new Vector3(position.x - 2, position.y, 0.002f);
-                    euler = new Vector3(0, 0, 180);
+                    euler = Vector3.forward * 180;
                     break;
                 default:
                     position = new Vector3(position.x, position.y - 2, 0.002f);
-                    euler = new Vector3(0, 0, 270);
+                    euler = Vector3.forward * 270;
                     break;
             }
             GameObject effect = Instantiate(

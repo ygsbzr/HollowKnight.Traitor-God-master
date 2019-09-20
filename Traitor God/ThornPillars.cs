@@ -12,7 +12,7 @@ namespace Traitor_God
         {
             foreach (GameObject thorns in thornsList)
             {
-                thorns.GetComponent<Rigidbody2D>().velocity = new Vector2(0, y);
+                thorns.GetComponent<Rigidbody2D>().velocity = Vector2.up * y;
             }
         }
 
@@ -26,7 +26,9 @@ namespace Traitor_God
 
         /* AOE thorn pillars */
         public static List<GameObject> thornsList = new List<GameObject>();   // List containing all thorn GameObjects
-        public static void AddThornPillars(PlayMakerFSM fsm, tk2dSpriteAnimator anim, Transform trans)
+        public static void AddThornPillars(PlayMakerFSM fsm, 
+                                           tk2dSpriteAnimator anim, 
+                                           Transform trans)
         {
             string[] states =
             {
@@ -143,7 +145,7 @@ namespace Traitor_God
             IEnumerator ThornPillarsRecover()
             {
                 Traitor.ClearGameObjectList(thornsList);
-                Traitor.Anim.Play("Idle");
+                anim.Play("Idle");
 
                 yield return null;
             }
@@ -152,6 +154,6 @@ namespace Traitor_God
             fsm.GetAction<SendRandomEventV2>("Slam?").AddToSendRandomEventV2("Thorn Pillars Appear", 0.15f, 1);
         }
 
-        private static void Log(object message) => TraitorFinder.Log(message);
+        private static void Log(object message) => Modding.Logger.Log($"[Thorn Pillars]: " + message);
     }
 }

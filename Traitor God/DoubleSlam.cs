@@ -12,7 +12,9 @@ namespace Traitor_God
     public class DoubleSlam : MonoBehaviour
     {
         /* Two successive slam waves */
-        public static void AddDoubleSlam(PlayMakerFSM fsm, tk2dSpriteAnimator anim, Transform trans)
+        public static void AddDoubleSlam(PlayMakerFSM fsm, 
+                                         tk2dSpriteAnimator anim, 
+                                         Transform trans)
         {
             string[] states =
             {
@@ -30,13 +32,13 @@ namespace Traitor_God
                 Vector2 pos = trans.position;
                 float[] velocities = { -speed, speed };
                 Vector3 spawnPos = new Vector3(pos.x, pos.y - 5, 6.4f);
-                Quaternion rot = Quaternion.Euler(0, 0, 0); ;
+                Quaternion rot = Quaternion.identity;
 
                 foreach (float velocity in velocities)
                 {
                     GameObject wave = Instantiate(fsm.GetAction<SpawnObjectFromGlobalPool>("Waves", 0).gameObject.Value, spawnPos, rot);
-                    wave.GetComponent<Rigidbody2D>().velocity = new Vector2(velocity, 0);
-                    wave.GetComponentInChildren<SpriteRenderer>().flipX = (velocity < 0);
+                    wave.GetComponent<Rigidbody2D>().velocity = Vector2.right * velocity;
+                    wave.GetComponentInChildren<SpriteRenderer>().flipX = velocity < 0;
                     Destroy(wave, timeToLive);
                 }
             }
@@ -84,6 +86,6 @@ namespace Traitor_God
             fsm.GetAction<SendRandomEventV2>("Slam?").AddToSendRandomEventV2("Double Slam Antic", 0.2f, 2);
         }
 
-        private static void Log(object message) => TraitorFinder.Log(message);
+        private static void Log(object message) => Modding.Logger.Log($"[Double Slam]: " + message);
     }
 }

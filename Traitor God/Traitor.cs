@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using HutongGames.PlayMaker;
 using HutongGames.PlayMaker.Actions;
 using ModCommon;
 using UnityEngine;
@@ -18,7 +17,7 @@ namespace Traitor_God
         private const int TotalHealth = Phase1Health + Phase2Health + Phase3Health;
 
         /* DSlash targeting value */
-        private int _dSlashSpeed = 75;
+        private readonly int _dSlashSpeed = 75;
 
         /* Phase Boolean triggers */
         private bool _enteredPhase2;
@@ -28,27 +27,27 @@ namespace Traitor_God
         public static Color infectionOrange = new Color32(255, 50, 0, 255);
 
         /* Components */
-        public static tk2dSpriteAnimator Anim;
-        public static AudioSource Audio;
+        public static AudioSource Audio;        // Audio is access by TraitorAudio, so make it public and static
         public static PlayMakerFSM Control;     // Control is accessed by TinkSound, so make it public and static
+        private tk2dSpriteAnimator _anim;
         private PlayMakerFSM _gpzControl;
         private HealthManager _hm;
-        public static Rigidbody2D Rb;
-        public static Transform Trans;
+        private Rigidbody2D _rb;
+        private Transform _trans;
 
         /* Trail left behind by Traitor God */
         private ParticleSystem _trail;
 
         private void Awake()
         {
-            Anim = gameObject.GetComponent<tk2dSpriteAnimator>();
+            _anim = gameObject.GetComponent<tk2dSpriteAnimator>();
             Audio = gameObject.GetComponent<AudioSource>();
             Control = gameObject.LocateMyFSM("Mantis");
             /* Used to spawn shockwaves */
             _gpzControl = TraitorGod.PreloadedGameObjects["GPZ"].LocateMyFSM("Control");
             _hm = gameObject.GetComponent<HealthManager>();
-            Rb = gameObject.GetComponent<Rigidbody2D>();
-            Trans = GetComponent<Transform>();
+            _rb = gameObject.GetComponent<Rigidbody2D>();
+            _trans = GetComponent<Transform>();
 
             Log("Using alt version: " + PlayerData.instance.statueStateTraitorLord.usingAltVersion);
             Log("Using alt version2: " + PlayerData.instance.GetVariable<BossStatue.Completion>("statueStateTraitor").usingAltVersion);
@@ -102,7 +101,7 @@ namespace Traitor_God
             Control.InsertMethod("Land", 0, GroundPound.SpawnShockwaves(transform, _gpzControl, 1, 1, 25, 2));
 
             /* Loop DSlash animation */
-            Anim.GetClipByName("DSlash").wrapMode = tk2dSpriteAnimationClip.WrapMode.Loop;
+            _anim.GetClipByName("DSlash").wrapMode = tk2dSpriteAnimationClip.WrapMode.Loop;
 
             Log("Changing to New Sprites");
             /* Change sprites using Mola's Traitor God sprite sheets */
@@ -112,11 +111,11 @@ namespace Traitor_God
             ChangeWaveSprite(1);
 
             /* Add new moves to Phase 1 */
-            GroundPound.AddGroundPound(Control, _gpzControl, _trail, Anim, Rb, Trans);
-            WallFall.AddWallFall(Control, Anim, Rb, Trans);
+            GroundPound.AddGroundPound(Control, _gpzControl, _trail, _anim, _rb, _trans);
+            WallFall.AddWallFall(Control, _anim, _rb, _trans);
 
             /* Miscellaneous */
-            ChangeStateValues.ChangeFSMValues();
+            ChangeStateValues.ChangeFSMValues(Control);
         }
 
         /* Transition to Wall Fall state when Traitor God is in the DSlash state,
@@ -138,19 +137,19 @@ namespace Traitor_God
                 {
                     Log("Entered Phase 2");
                     _enteredPhase2 = true;
-                    DoubleSlam.AddDoubleSlam(Control, Anim, Trans);
+                    DoubleSlam.AddDoubleSlam(Control, _anim, _trans);
                 }
                 else if (_hm.hp < Phase3Health && !_enteredPhase3)
                 {
                     Log("Entered Phase 3");
                     _enteredPhase3 = true;
-                    TriSpearThrow.AddTriSpearThrow(Control, Anim, Rb, Trans);
-                    ThornPillars.AddThornPillars(Control, Anim, Trans);
+                    TriSpearThrow.AddTriSpearThrow(Control, _anim, _rb, _trans);
+                    ThornPillars.AddThornPillars(Control, _anim, _trans);
                 }
             }
         }
 
-        private static void Log(object message) => TraitorFinder.Log(message);
+        private static void Log(object message) => Modding.Logger.Log($"[Traitor]: " + message);
 
         public static void ClearGameObjectList(List<GameObject> gameObjectList)
         {
@@ -187,7 +186,7 @@ namespace Traitor_God
         /* Always target the player on DSlash */
         private void DSlashTargetPlayer()
         {
-            Vector2 dSlashVector = TriSpearThrow.GetVectorToPlayer(Trans) * _dSlashSpeed; ;
+            Vector2 dSlashVector = TriSpearThrow.GetVectorToPlayer(_trans) * _dSlashSpeed; ;
 
             Control.GetAction<SetVelocity2d>("DSlash").x = dSlashVector.x;
             Control.GetAction<SetVelocity2d>("DSlash").y = dSlashVector.y;
@@ -211,12 +210,12 @@ namespace Traitor_God
                         .GetAction<SpawnObjectFromGlobalPool>("Sickle Throw")
                         .gameObject.Value, pos.SetY(sicklePosY), angle);
 
-                    sickle.GetComponent<Rigidbody2D>().velocity = new Vector2(x, 0);
+                    sickle.GetComponent<Rigidbody2D>().velocity = Vector2.right * x;
                     sickle.GetComponent<DamageHero>().damageDealt = damage;
                     sickle.name = "Slash Sickle";   // Differentiate these sickles from the ones thrown in a sinusoid
                     Destroy(sickle.GetComponent<AudioSource>());
                     Destroy(sickle.GetComponent<PlayMakerFSM>());
-                    Destroy(sickle, 2.0f);
+                    Destroy(sickle, 2);
                 }
             };
         }
@@ -225,7 +224,7 @@ namespace Traitor_God
         private void ChangeWaveSprite(int spriteIndex)
         {
             Vector3 position = Vector3.zero;
-            Quaternion rotation = Quaternion.Euler(position);
+            Quaternion rotation = Quaternion.identity;
             GameObject wave = Instantiate(Control.GetAction<SpawnObjectFromGlobalPool>("Waves").gameObject.Value,
                 position, rotation);
             byte[] spriteSheetByteData = TraitorGod.SpriteBytes[spriteIndex];

@@ -17,11 +17,11 @@ namespace Traitor_God
             USceneManager.activeSceneChanged += SceneChanged;
         }
 
-        private void SceneChanged(Scene previousScene, Scene currentScene)
+        private void SceneChanged(Scene previousScene, Scene nextScene)
         {
             /* Passing the strings instead of the Scenes because that's all we use and
              Unity kills the prev scene's name after <1 frame */
-            StartCoroutine(SceneChangedRoutine(previousScene.name, currentScene.name));
+            StartCoroutine(SceneChangedRoutine(previousScene.name, nextScene.name));
         }
 
         private IEnumerator SceneChangedRoutine(string prev, string next)

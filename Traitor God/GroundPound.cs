@@ -12,7 +12,12 @@ namespace Traitor_God
         private static int groundPoundVelocity = 60;
 
         /* Spawn shockwaves on either side */
-        public static Action SpawnShockwaves(Transform trans, PlayMakerFSM shockwaveFSM, float width, float height, float speed, int damage)
+        public static Action SpawnShockwaves(Transform trans, 
+                                             PlayMakerFSM shockwaveFSM, 
+                                             float width, 
+                                             float height, 
+                                             float speed, 
+                                             int damage)
         {
             return () =>
             {
@@ -43,7 +48,12 @@ namespace Traitor_God
         }
 
         /* Vertical ground pound, indicated by a red trail */
-        public static void AddGroundPound(PlayMakerFSM fsm, PlayMakerFSM shockwaveFSM, ParticleSystem trail, tk2dSpriteAnimator anim, Rigidbody2D rb, Transform trans)
+        public static void AddGroundPound(PlayMakerFSM fsm, 
+                                          PlayMakerFSM shockwaveFSM, 
+                                          ParticleSystem trail, 
+                                          tk2dSpriteAnimator anim, 
+                                          Rigidbody2D rb, 
+                                          Transform trans)
         {
             string[] states =
             {
@@ -103,7 +113,7 @@ namespace Traitor_God
             {
                 anim.Play("Land");
                 GameCameras.instance.cameraShakeFSM.SendEvent("SmallShake");
-                rb.velocity = new Vector2(0, 0);
+                rb.velocity = Vector2.zero;
                 trans.rotation = Quaternion.identity;
                 TraitorAudio.PlayAudioClip("Land");
 
@@ -127,6 +137,6 @@ namespace Traitor_God
             fsm.GetAction<SendRandomEventV2>("Attack Choice").AddToSendRandomEventV2("Ground Pound Jump Antic", 0.33f, 1);
         }
 
-        private static void Log(object message) => TraitorFinder.Log(message);
+        private static void Log(object message) => Modding.Logger.Log($"[Ground Pound]: " + message);
     }
 }

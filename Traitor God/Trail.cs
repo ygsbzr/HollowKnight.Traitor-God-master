@@ -6,7 +6,13 @@ namespace Traitor_God
     public class Trail
     {
         /* Taken and modified from https://github.com/5FiftySix6/HollowKnight.Pale-Prince/blob/master/Pale%20Prince/Prince.cs */
-        public static ParticleSystem AddTrail(GameObject go, int startSize, float lifetime, float shapeRadius, int damage, float offset = 0, Color? c = null)
+        public static ParticleSystem AddTrail(GameObject go, 
+                                              float startSize, 
+                                              float lifetime, 
+                                              float shapeRadius, 
+                                              int damage, 
+                                              float offset = 0, 
+                                              Color? c = null)
         {
             ParticleSystem trail = go.AddComponent<ParticleSystem>();
             if (trail == null)
@@ -57,6 +63,6 @@ namespace Traitor_God
             return trail;
         }
 
-        private static void Log(object message) => TraitorFinder.Log(message);
+        private static void Log(object message) => Modding.Logger.Log($"[Trail]: " + message);
     }
 }
