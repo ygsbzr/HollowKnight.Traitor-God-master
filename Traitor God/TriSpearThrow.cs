@@ -42,14 +42,13 @@ namespace Traitor_God
             IEnumerator TriSpearThrowAntic()
             {
                 anim.Play("Sickle Throw Antic");
-                Traitor.Audio.pitch = 0.9f;
-                TraitorAudio.PlayAudioClip("Slash Antic");
+                Traitor.Audio.pitch = 1.0f;
+                TraitorAudio.PlayAudioClip("Teleport");
                 rb.velocity = Vector2.zero;
 
                 vectorToTarget = GetVectorToPlayer(trans);
 
-                // + 90 degrees because spear sprite is facing down and must be rotated to align with 0 degrees Cartesian
-                float angle = (float)Math.Atan2(vectorToTarget.y, vectorToTarget.x) * Mathf.Rad2Deg + 90;
+                float angle = (float)Math.Atan2(vectorToTarget.y, vectorToTarget.x) * Mathf.Rad2Deg;
                 Log("Angle: " + angle);
                 _angles = new float[] {
                         angle - 30,
@@ -68,7 +67,7 @@ namespace Traitor_God
                     spear.SetActive(true);
                     spear.layer = 11;
                     spear.AddComponent<Rigidbody2D>().isKinematic = true;
-                    Trail.AddTrail(spear, 2, 0.25f, 0.5f, 2, 0, Traitor.infectionOrange);
+                    Trail.AddTrail(spear, 2, 0.25f, 0.5f, 2, 0, Traitor.InfectionOrange);
                     spearDict.Add(spear, _angle);
 
                     Destroy(spear, 5);
@@ -92,16 +91,17 @@ namespace Traitor_God
                     Log("Getting spear");
                     GameObject spear = entry.Key;
                     float angle = entry.Value;
+                    spear.GetComponent<SpriteRenderer>().sprite = TraitorGod.Sprites[3];
                     BoxCollider2D spearCollider = spear.AddComponent<BoxCollider2D>();
 # if DEBUG
                     spear.AddComponent<DebugColliders>();
 # endif
                     spear.AddComponent<TinkEffect>();
                     spear.AddComponent<TinkSound>();
-                    spearCollider.size = new Vector2(1, 12);
+                    spearCollider.size = new Vector2(12, 1);
                     spear.AddComponent<DamageHero>().damageDealt = 2;
-                    float x = (float)Math.Cos((angle - 90) / Mathf.Rad2Deg);
-                    float y = (float)Math.Sin((angle - 90) / Mathf.Rad2Deg);
+                    float x = (float)Math.Cos(angle / Mathf.Rad2Deg);
+                    float y = (float)Math.Sin(angle / Mathf.Rad2Deg);
                     Vector2 spearVelocity = new Vector2(x, y) * spearThrowSpeed;
                     spear.GetComponent<Rigidbody2D>().velocity = spearVelocity;
                 }

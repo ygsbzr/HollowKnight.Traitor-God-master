@@ -127,7 +127,7 @@ namespace Traitor_God
             IEnumerator GroundPoundRecover()
             {
                 ParticleSystem.MainModule main = trail.main;
-                main.startColor = Traitor.infectionOrange;
+                main.startColor = Traitor.InfectionOrange;
 
                 yield return new WaitForSeconds(1.0f);
             }

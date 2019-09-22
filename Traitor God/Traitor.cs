@@ -24,11 +24,12 @@ namespace Traitor_God
         private bool _enteredPhase3;
 
         /* Color of infection trails */
-        public static Color infectionOrange = new Color32(255, 50, 0, 255);
+        public static Color InfectionOrange = new Color32(255, 50, 0, 255);
 
         /* Components */
         public static AudioSource Audio;        // Audio is access by TraitorAudio, so make it public and static
         public static PlayMakerFSM Control;     // Control is accessed by TinkSound, so make it public and static
+        public static PlayMakerFSM MageControl;    // WarriorControl is access by TraitorAudio, so make it public and static
         private tk2dSpriteAnimator _anim;
         private PlayMakerFSM _gpzControl;
         private HealthManager _hm;
@@ -45,6 +46,8 @@ namespace Traitor_God
             Control = gameObject.LocateMyFSM("Mantis");
             /* Used to spawn shockwaves */
             _gpzControl = TraitorGod.PreloadedGameObjects["GPZ"].LocateMyFSM("Control");
+            /* Used for teleport sound */
+            MageControl = TraitorGod.PreloadedGameObjects["Soul Master"].LocateMyFSM("Mage Lord");
             _hm = gameObject.GetComponent<HealthManager>();
             _rb = gameObject.GetComponent<Rigidbody2D>();
             _trans = GetComponent<Transform>();
@@ -80,7 +83,7 @@ namespace Traitor_God
                 yield break;
             }
 
-            _trail = Trail.AddTrail(gameObject, 4, 0.8f, 1.5f, 2, 1.8f, infectionOrange);
+            _trail = Trail.AddTrail(gameObject, 4, 0.8f, 1.5f, 2, 1.8f, InfectionOrange);
 
             /* Disable empty walks */
             Control.RemoveTransition("Feint?", "Feint");
@@ -168,8 +171,8 @@ namespace Traitor_God
 
         private void ResetTextures()
         {
-            gameObject.GetComponent<tk2dSprite>().GetCurrentSpriteDef().material.mainTexture = TraitorGod.Sprites[3].texture;
-            ChangeWaveSprite(4);
+            gameObject.GetComponent<tk2dSprite>().GetCurrentSpriteDef().material.mainTexture = TraitorGod.Sprites[4].texture;
+            ChangeWaveSprite(5);
         }
 
         /* Add a trail to all GameObjects with the name "Shot Traitor Lord(Clone)" */
@@ -179,7 +182,7 @@ namespace Traitor_God
             foreach (GameObject sickle in sickles)
             {
                 sickle.GetComponent<DamageHero>().damageDealt = 2;
-                Trail.AddTrail(sickle, 2, 0.5f, 0.75f, 2, 0, infectionOrange);
+                Trail.AddTrail(sickle, 2, 0.5f, 0.75f, 2, 0, InfectionOrange);
             }
         }
 

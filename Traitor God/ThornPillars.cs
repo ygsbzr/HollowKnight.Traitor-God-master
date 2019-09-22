@@ -74,11 +74,11 @@ namespace Traitor_God
                 {
                     for (float j = 62f; j <= 105; j += 5)
                     {
-                        SpawnThorns("ThornsL", new Vector2(8, 2), new Vector3(i - 1, j, 0));
-                        SpawnThorns("BlackThorns", new Vector2(5, 2), new Vector3(i, j, 0));
-                        SpawnThorns("ThornsR", new Vector2(8, 2), new Vector3(i + 1, j, 0));
+                        SpawnThorns("Thorns Left", new Vector2(8, 2), new Vector3(i - 1, j, 0));
+                        SpawnThorns("Black Thorns", new Vector2(5, 2), new Vector3(i, j, 0));
+                        SpawnThorns("Thorns Right", new Vector2(8, 2), new Vector3(i + 1, j, 0));
                     }
-                    SpawnThorns("ThornPoint", new Vector2(3, 8), new Vector3(i, 59, 0));
+                    SpawnThorns("Thorn Point", new Vector2(3, 8), new Vector3(i, 59, 0));
                 }
 
                 /* Spawn thorn pillars on right side of Traitor God */
@@ -86,11 +86,11 @@ namespace Traitor_God
                 {
                     for (float j = 62f; j <= 105; j += 5)
                     {
-                        SpawnThorns("ThornsL", new Vector2(8, 2), new Vector3(i - 1, j, 0));
-                        SpawnThorns("BlackThorns", new Vector2(5, 2), new Vector3(i, j, 0));
-                        SpawnThorns("ThornsR", new Vector2(8, 2), new Vector3(i + 1, j, 0));
+                        SpawnThorns("Thorns Left", new Vector2(8, 2), new Vector3(i - 1, j, 0));
+                        SpawnThorns("Black Thorns", new Vector2(5, 2), new Vector3(i, j, 0));
+                        SpawnThorns("Thorns Right", new Vector2(8, 2), new Vector3(i + 1, j, 0));
                     }
-                    SpawnThorns("ThornPoint", new Vector2(3, 8), new Vector3(i, 59, 0));
+                    SpawnThorns("Thorn Point", new Vector2(3, 8), new Vector3(i, 59, 0));
                 }
 
                 SetThornPillarVelocity(-60);

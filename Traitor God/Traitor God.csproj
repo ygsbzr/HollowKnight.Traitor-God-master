@@ -14,12 +14,15 @@
     <EmbeddedResource Include="Assets\0_TraitorGod.png" />
     <EmbeddedResource Include="Assets\1_Waves.png" />
     <EmbeddedResource Include="Assets\2_TraitorSpear.png" />
-    <EmbeddedResource Include="Assets\3_TraitorLord.png" />
-    <EmbeddedResource Include="Assets\4_Waves.png" />
-    <EmbeddedResource Include="Assets\5_Blank.png" />
+    <EmbeddedResource Include="Assets\3_TraitorSpearBlur.png" />
+    <EmbeddedResource Include="Assets\4_TraitorLord.png" />
+    <EmbeddedResource Include="Assets\5_Waves.png" />
   </ItemGroup>
 
   <ItemGroup>
+    <Reference Include="Assembly-CSharp">
+      <HintPath>..\..\..\..\..\Desktop\Managed\Assembly-CSharp.dll</HintPath>
+    </Reference>
     <Reference Include="Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Hollow Knight\hollow_knight_Data\Managed\Assembly-CSharp.dll</HintPath>
     </Reference>
@@ -35,6 +38,9 @@
     <Reference Include="UnityEngine.AudioModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Hollow Knight\hollow_knight_Data\Managed\UnityEngine.AudioModule.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine">
+      <HintPath>..\..\..\..\..\Desktop\Managed\UnityEngine.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Hollow Knight\hollow_knight_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
     </Reference>
@@ -47,68 +53,11 @@
     <Reference Include="UnityEngine.ParticleSystemModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Hollow Knight\hollow_knight_Data\Managed\UnityEngine.ParticleSystemModule.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.Physics2DModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Hollow Knight\hollow_knight_Data\Managed\UnityEngine.Physics2DModule.dll</HintPath>
-    </Reference>
-    <Reference Include="Assembly-CSharp">
-      <HintPath>..\..\..\.local\share\Steam\steamapps\common\Hollow Knight\hollow_knight_Data\Managed\Assembly-CSharp.dll</HintPath>
-    </Reference>
-    <Reference Include="ModCommon">
-      <HintPath>..\..\..\Desktop\Managed\Mods\ModCommon.dll</HintPath>
-    </Reference>
-    <Reference Include="PlayMaker">
-      <HintPath>..\..\..\.local\share\Steam\steamapps\common\Hollow Knight\hollow_knight_Data\Managed\PlayMaker.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.AudioModule">
-      <HintPath>..\..\..\.local\share\Steam\steamapps\common\Hollow Knight\hollow_knight_Data\Managed\UnityEngine.AudioModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.CoreModule">
-      <HintPath>..\..\..\.local\share\Steam\steamapps\common\Hollow Knight\hollow_knight_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine">
-      <HintPath>..\..\..\.local\share\Steam\steamapps\common\Hollow Knight\hollow_knight_Data\Managed\UnityEngine.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.ImageConversionModule">
-      <HintPath>..\..\..\.local\share\Steam\steamapps\common\Hollow Knight\hollow_knight_Data\Managed\UnityEngine.ImageConversionModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.JSONSerializeModule">
-      <HintPath>..\..\..\.local\share\Steam\steamapps\common\Hollow Knight\hollow_knight_Data\Managed\UnityEngine.JSONSerializeModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.ParticleSystemModule">
-      <HintPath>..\..\..\.local\share\Steam\steamapps\common\Hollow Knight\hollow_knight_Data\Managed\UnityEngine.ParticleSystemModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.Physics2DModule">
-      <HintPath>..\..\..\.local\share\Steam\steamapps\common\Hollow Knight\hollow_knight_Data\Managed\UnityEngine.Physics2DModule.dll</HintPath>
-    </Reference>
-    <Reference Include="Assembly-CSharp">
-      <HintPath>..\..\..\..\..\Desktop\Managed\Assembly-CSharp.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.AudioModule">
-      <HintPath>..\..\..\..\..\Desktop\Managed\UnityEngine.AudioModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.CoreModule">
-      <HintPath>..\..\..\..\..\Desktop\Managed\UnityEngine.CoreModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine">
-      <HintPath>..\..\..\..\..\Desktop\Managed\UnityEngine.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.ImageConversionModule">
-      <HintPath>..\..\..\..\..\Desktop\Managed\UnityEngine.ImageConversionModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.JSONSerializeModule">
-      <HintPath>..\..\..\..\..\Desktop\Managed\UnityEngine.JSONSerializeModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.ParticleSystemModule">
-      <HintPath>..\..\..\..\..\Desktop\Managed\UnityEngine.ParticleSystemModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.Physics2DModule">
-      <HintPath>..\..\..\..\..\Desktop\Managed\UnityEngine.Physics2DModule.dll</HintPath>
-    </Reference>
-    <Reference Include="ModCommon">
-      <HintPath>..\..\..\..\..\Desktop\Mods\ModCommon.dll</HintPath>
-    </Reference>
     <Reference Include="PlayMaker">
       <HintPath>..\..\..\..\..\Desktop\Managed\PlayMaker.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.Physics2DModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Hollow Knight\hollow_knight_Data\Managed\UnityEngine.Physics2DModule.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

@@ -23,6 +23,8 @@ namespace Traitor_God
                     return Traitor.Control.GetAction<AudioPlayerOneShot>("Attack 1").audioClips[0];
                 case "Slamming":
                     return (AudioClip)Traitor.Control.GetAction<AudioPlayerOneShotSingle>(clipName).audioClip.Value;
+                case "Teleport":
+                    return (AudioClip)Traitor.MageControl.GetAction<AudioPlayerOneShotSingle>("Teleport").audioClip.Value;
                 default:
                     return null;
             }

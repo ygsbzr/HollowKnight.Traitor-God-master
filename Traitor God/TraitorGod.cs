@@ -41,6 +41,7 @@ namespace Traitor_God
                 ("Fungus3_11", "fungd_spikes_09_FG"),
                 ("Fungus3_11", "fungd_spike_sil_04"),
                 ("GG_Ghost_No_Eyes_V", "fungd_spikes_0_0001_d"),
+                ("GG_Soul_Master", "Mage Lord"),
             };
         }
         
@@ -48,11 +49,12 @@ namespace Traitor_God
         {
             Log("Storing GameObjects");
             PreloadedGameObjects.Add("GPZ", preloadedObjects["GG_Grey_Prince_Zote"]["Grey Prince"]);
-            PreloadedGameObjects.Add("ThornsL", preloadedObjects["Fungus3_11"]["fungd_spikes_09_FG 7"]);
-            PreloadedGameObjects.Add("ThornsR", preloadedObjects["Fungus3_11"]["fungd_spikes_09_FG"]);
-            PreloadedGameObjects.Add("BlackThorns", preloadedObjects["Fungus3_11"]["fungd_spike_sil_04"]);
-            PreloadedGameObjects.Add("ThornPoint", preloadedObjects["GG_Ghost_No_Eyes_V"]["fungd_spikes_0_0001_d"]);
+            PreloadedGameObjects.Add("Thorns Left", preloadedObjects["Fungus3_11"]["fungd_spikes_09_FG 7"]);
+            PreloadedGameObjects.Add("Thorns Right", preloadedObjects["Fungus3_11"]["fungd_spikes_09_FG"]);
+            PreloadedGameObjects.Add("Black Thorns", preloadedObjects["Fungus3_11"]["fungd_spike_sil_04"]);
+            PreloadedGameObjects.Add("Thorn Point", preloadedObjects["GG_Ghost_No_Eyes_V"]["fungd_spikes_0_0001_d"]);
             PreloadedGameObjects.Add("Spear", preloadedObjects["GG_Ghost_No_Eyes_V"]["fungd_spikes_0_0001_d"]);
+            PreloadedGameObjects.Add("Soul Master", preloadedObjects["GG_Soul_Master"]["Mage Lord"]);
 
             Instance = this;
             
