@@ -18,20 +18,6 @@ namespace Traitor_God
         private static readonly FieldInfo FsmStringParamsFi = typeof(ActionData).GetField("fsmStringParams", BindingFlags.NonPublic | BindingFlags.Instance);
 
         [PublicAPI]
-        public static void RemoveAction(this PlayMakerFSM fsm, string stateName, int index)
-        {
-            FsmState t = fsm.GetState(stateName);
-
-            FsmStateAction[] actions = t.Actions;
-
-            FsmStateAction action = fsm.GetAction(stateName, index);
-            actions = actions.Where(x => x != action).ToArray();
-            Log(action.GetType().ToString());
-
-            t.Actions = actions;
-        }
-
-        [PublicAPI]
         public static void RemoveAction<T>(this PlayMakerFSM fsm, string stateName) where T : FsmStateAction
         {
             FsmState t = fsm.GetState(stateName);
@@ -46,37 +32,11 @@ namespace Traitor_God
         }
 
         [PublicAPI]
-        public static void RemoveAnim(this PlayMakerFSM fsm, string stateName, int index)
-        {
-            var anim = fsm.GetAction<Tk2dPlayAnimationWithEvents>(stateName, index);
-            var @event = new FsmEvent(anim.animationCompleteEvent ?? anim.animationTriggerEvent);
-            fsm.RemoveAction(stateName, index);
-            fsm.InsertAction(stateName, new NextFrameEvent
-            {
-                sendEvent = @event,
-                Active = true,
-                Enabled = true
-            }, index);
-        }
-
-        [PublicAPI]
         public static FsmState GetState(this PlayMakerFSM fsm, string stateName)
         {
             return fsm.FsmStates.FirstOrDefault(t => t.Name == stateName);
         }
-
-        [PublicAPI]
-        public static FsmState CopyState(this PlayMakerFSM fsm, string stateName, string newState)
-        {
-            var state = new FsmState(fsm.GetState(stateName)) { Name = newState };
-
-            List<FsmState> fsmStates = fsm.FsmStates.ToList();
-            fsmStates.Add(state);
-            fsm.Fsm.States = fsmStates.ToArray();
-
-            return state;
-        }
-
+        
         [PublicAPI]
         public static FsmStateAction GetAction(this PlayMakerFSM fsm, string stateName, int index)
         {
@@ -93,19 +53,6 @@ namespace Traitor_God
         public static T GetAction<T>(this PlayMakerFSM fsm, string stateName) where T : FsmStateAction
         {
             return fsm.GetState(stateName).Actions.FirstOrDefault(x => x is T) as T;
-        }
-
-        [PublicAPI]
-        public static void AddAction(this PlayMakerFSM fsm, string stateName, FsmStateAction action)
-        {
-            FsmState t = fsm.GetState(stateName);
-
-            FsmStateAction[] actions = t.Actions;
-
-            Array.Resize(ref actions, actions.Length + 1);
-            actions[actions.Length - 1] = action;
-
-            t.Actions = actions;
         }
 
         [PublicAPI]
@@ -126,20 +73,6 @@ namespace Traitor_God
         public static void InsertAction(this PlayMakerFSM fsm, string state, int ind, FsmStateAction action)
         {
             InsertAction(fsm, state, action, ind);
-        }
-
-        [PublicAPI]
-        public static void ChangeTransition(this PlayMakerFSM fsm, string stateName, string eventName, string toState)
-        {
-            FsmState t = fsm.GetState(stateName);
-
-            foreach (FsmTransition trans in t.Transitions)
-            {
-                if (trans.EventName == eventName)
-                {
-                    trans.ToState = toState;
-                }
-            }
         }
 
         [PublicAPI]
@@ -197,121 +130,6 @@ namespace Traitor_God
         }
 
         [PublicAPI]
-        public static void ReplaceStringVariable(this PlayMakerFSM fsm, List<string> states, Dictionary<string, string> dict)
-        {
-            foreach (FsmState t in fsm.FsmStates)
-            {
-                bool found = false;
-                if (!states.Contains(t.Name)) continue;
-                foreach (FsmString str in (List<FsmString>)FsmStringParamsFi.GetValue(t.ActionData))
-                {
-                    List<FsmString> val = new List<FsmString>();
-                    if (dict.ContainsKey(str.Value))
-                    {
-                        val.Add(dict[str.Value]);
-                        found = true;
-                    }
-                    else
-                    {
-                        val.Add(str);
-                    }
-
-                    if (val.Count > 0)
-                    {
-                        FsmStringParamsFi.SetValue(t.ActionData, val);
-                    }
-                }
-
-                if (found)
-                {
-                    t.LoadActions();
-                }
-            }
-        }
-
-        [PublicAPI]
-        public static void ReplaceStringVariable(this PlayMakerFSM fsm, string state, Dictionary<string, string> dict)
-        {
-            foreach (FsmState t in fsm.FsmStates)
-            {
-                bool found = false;
-                if (t.Name != state && state != "") continue;
-                foreach (FsmString str in (List<FsmString>)FsmStringParamsFi.GetValue(t.ActionData))
-                {
-                    List<FsmString> val = new List<FsmString>();
-                    if (dict.ContainsKey(str.Value))
-                    {
-                        val.Add(dict[str.Value]);
-                        found = true;
-                    }
-                    else
-                    {
-                        val.Add(str);
-                    }
-
-                    if (val.Count > 0)
-                    {
-                        FsmStringParamsFi.SetValue(t.ActionData, val);
-                    }
-                }
-
-                if (found)
-                {
-                    t.LoadActions();
-                }
-            }
-        }
-
-        [PublicAPI]
-        public static void ReplaceStringVariable(this PlayMakerFSM fsm, string state, string src, string dst)
-        {
-            Log("Replacing FSM Strings");
-            foreach (FsmState t in fsm.FsmStates)
-            {
-                bool found = false;
-                if (t.Name != state && state != "") continue;
-                Log($"Found FsmState with name \"{t.Name}\" ");
-                foreach (FsmString str in (List<FsmString>)FsmStringParamsFi.GetValue(t.ActionData))
-                {
-                    List<FsmString> val = new List<FsmString>();
-                    Log($"Found FsmString with value \"{str}\" ");
-                    if (str.Value.Contains(src))
-                    {
-                        val.Add(dst);
-                        found = true;
-                        Log($"Found FsmString with value \"{str}\", changing to \"{dst}\" ");
-                    }
-                    else
-                    {
-                        val.Add(str);
-                    }
-
-                    if (val.Count > 0)
-                    {
-                        FsmStringParamsFi.SetValue(t.ActionData, val);
-                    }
-                }
-
-                if (found)
-                {
-                    t.LoadActions();
-                }
-            }
-        }
-
-        [PublicAPI]
-        public static void AddCoroutine(this PlayMakerFSM fsm, string stateName, Func<IEnumerator> method)
-        {
-            fsm.InsertCoroutine(stateName, fsm.GetState(stateName).Actions.Length, method);
-        }
-
-        [PublicAPI]
-        public static void AddMethod(this PlayMakerFSM fsm, string stateName, Action method)
-        {
-            fsm.InsertMethod(stateName, fsm.GetState(stateName).Actions.Length, method);
-        }
-
-        [PublicAPI]
         public static void InsertMethod(this PlayMakerFSM fsm, string stateName, int index, Action method)
         {
             InsertAction(fsm, stateName, new InvokeMethod(method), index);
@@ -336,16 +154,6 @@ namespace Traitor_God
 
             intVars.Add(@new);
             fsm.Fsm.Variables.IntVariables = intVars.ToArray();
-            return @new;
-        }
-
-        [PublicAPI]
-        public static FsmBool CreateBool(this PlayMakerFSM fsm, string boolName)
-        {
-            var @new = new FsmBool(boolName);
-            List<FsmBool> boolVars = fsm.FsmVariables.BoolVariables.ToList();
-            boolVars.Add(@new);
-            fsm.Fsm.Variables.BoolVariables = boolVars.ToArray();
             return @new;
         }
 
@@ -380,46 +188,6 @@ namespace Traitor_God
             sre.eventMax = eventMax.ToArray();
         }
         
-        [PublicAPI]
-        public static void AddToSendRandomEventV3
-        (
-            this SendRandomEventV3 sre,
-            string toState,
-            float weight,
-            int eventMaxAmount,
-            int missedMaxAmount,
-            [CanBeNull] string eventName = null,
-            bool createInt = true
-        )
-        {
-            var fsm = sre.Fsm.Owner as PlayMakerFSM;
-            string state = sre.State.Name;
-            eventName = eventName ?? toState.Split(' ').First();
-
-            List<FsmEvent> events = sre.events.ToList();
-            List<FsmFloat> weights = sre.weights.ToList();
-            List<FsmInt> trackingInts = sre.trackingInts.ToList();
-            List<FsmInt> eventMax = sre.eventMax.ToList();
-            List<FsmInt> trackingIntsMissed = sre.trackingIntsMissed.ToList();
-            List<FsmInt> missedMax = sre.missedMax.ToList();
-
-            fsm.AddTransition(state, eventName, toState);
-
-            events.Add(fsm.GetState(state).Transitions.Single(x => x.FsmEvent.Name == eventName).FsmEvent);
-            weights.Add(weight);
-            trackingInts.Add(fsm.GetOrCreateInt($"Ct {eventName}"));
-            eventMax.Add(eventMaxAmount);
-            trackingIntsMissed.Add(fsm.GetOrCreateInt($"Ms {eventName}"));
-            missedMax.Add(missedMaxAmount);
-
-            sre.events = events.ToArray();
-            sre.weights = weights.ToArray();
-            sre.trackingInts = trackingInts.ToArray();
-            sre.eventMax = eventMax.ToArray();
-            sre.trackingIntsMissed = trackingIntsMissed.ToArray();
-            sre.missedMax = missedMax.ToArray();
-        }
-
         [PublicAPI]
         public static FsmState CreateState(this PlayMakerFSM fsm, string stateName)
         {

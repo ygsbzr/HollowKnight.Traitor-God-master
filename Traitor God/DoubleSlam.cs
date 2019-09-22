@@ -47,6 +47,7 @@ namespace Traitor_God
             IEnumerator DoubleSlamAntic()
             {
                 anim.Play("Shockwave Antic");
+                Traitor.Audio.pitch = 0.9f;
                 TraitorAudio.PlayAudioClip("Roar");
 
                 yield return new WaitForSeconds(0.5f);
