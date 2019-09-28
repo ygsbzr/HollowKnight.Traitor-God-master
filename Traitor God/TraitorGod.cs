@@ -176,6 +176,7 @@ namespace Traitor_God
             ModHooks.Instance.NewGameHook -= AddComponent;
             ModHooks.Instance.LanguageGetHook -= OnLangGet;
             ModHooks.Instance.SetPlayerVariableHook -= SetVariableHook;
+            ModHooks.Instance.GetPlayerVariableHook -= GetVariableHook;
             USceneManager.activeSceneChanged -= SceneChanged;
 
             TraitorFinder finder = GameManager.instance.gameObject.GetComponent<TraitorFinder>();

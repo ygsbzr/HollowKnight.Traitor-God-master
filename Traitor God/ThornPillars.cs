@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using HutongGames.PlayMaker.Actions;
+using ModCommon;
 using UnityEngine;
 
 namespace Traitor_God
@@ -12,7 +13,10 @@ namespace Traitor_God
         {
             foreach (GameObject thorns in thornsList)
             {
-                thorns.GetComponent<Rigidbody2D>().velocity = Vector2.up * y;
+                // GetOrAddComponent here because for some reason the Rigidbody2D cannot be retrieved for the thorns
+                Rigidbody2D rb = thorns.GetOrAddComponent<Rigidbody2D>();
+                rb.isKinematic = true;
+                rb.velocity = Vector2.up * y;
             }
         }
 
@@ -45,6 +49,7 @@ namespace Traitor_God
             /* Spawn thorn pillars and move them slightly into view at the top of the arena */
             IEnumerator ThornPillarsAppear()
             {
+                Log("Thorn Pillars Appear");
                 Traitor.Audio.time = 0.25f;
                 Traitor.Audio.pitch = 0.9f;
                 TraitorAudio.PlayAudioClip("Roar");
@@ -56,7 +61,7 @@ namespace Traitor_God
                     GameObject thorns = Instantiate(TraitorGod.PreloadedGameObjects[preloadedObjectName]);
                     thorns.SetActive(true);
                     thorns.layer = 17;
-                    thorns.AddComponent<BoxCollider2D>();
+                    thorns.AddComponent<BoxCollider2D>(); 
                     thorns.AddComponent<Rigidbody2D>().isKinematic = true;
                     BoxCollider2D thornsCollider = thorns.GetComponent<BoxCollider2D>();
                     thornsCollider.size = colliderSize;
@@ -66,9 +71,9 @@ namespace Traitor_God
                     thorns.transform.position = position;
                     thornsList.Add(thorns);
                 }
-
+                
                 Vector2 pos = trans.position;
-
+                
                 /* Spawn thorn pillars on left side of Traitor God */
                 for (float i = pos.x - 5; i >= 0; i -= 6)
                 {
@@ -80,7 +85,7 @@ namespace Traitor_God
                     }
                     SpawnThorns("Thorn Point", new Vector2(3, 8), new Vector3(i, 59, 0));
                 }
-
+                
                 /* Spawn thorn pillars on right side of Traitor God */
                 for (float i = pos.x + 5; i <= 75; i += 6)
                 {
@@ -92,7 +97,7 @@ namespace Traitor_God
                     }
                     SpawnThorns("Thorn Point", new Vector2(3, 8), new Vector3(i, 59, 0));
                 }
-
+                
                 SetThornPillarVelocity(-60);
 
                 yield return new WaitForSeconds(0.25f);
@@ -102,6 +107,7 @@ namespace Traitor_God
             /* Pause briefly to allow player to react */
             IEnumerator ThornPillarsAppearPause()
             {
+                Log("Thorn Pillars Appear Pause");
                 SetThornPillarVelocity(0);
 
                 yield return new WaitForSeconds(0.5f);
@@ -111,6 +117,7 @@ namespace Traitor_God
             /* Drop thorn pillars */
             IEnumerator ThornPillarsDrop()
             {
+                Log("Thorn Pillars Drop");
                 GameCameras.instance.cameraShakeFSM.SendEvent("EnemyKillShake");
                 SetThornPillarVelocity(-80);
 
@@ -121,6 +128,7 @@ namespace Traitor_God
             /* Keep pillars fully dropped for half a second */
             IEnumerator ThornPillarsDropPause()
             {
+                Log("Thorn Pillars Drop Pause");
                 GameCameras.instance.cameraShakeFSM.SendEvent("BigShake");
                 TraitorAudio.PlayAudioClip("Land");
 
@@ -135,6 +143,7 @@ namespace Traitor_God
             /* Retract pillars */
             IEnumerator ThornPillarsRetract()
             {
+                Log("Thorn Pillars Retract");
                 SetThornPillarVelocity(90);
 
                 yield return new WaitForSeconds(0.5f);
@@ -144,6 +153,7 @@ namespace Traitor_God
             /* Remove thorn pillars */
             IEnumerator ThornPillarsRecover()
             {
+                Log("Thorn Pillars Recover");
                 Traitor.ClearGameObjectList(thornsList);
                 anim.Play("Idle");
 

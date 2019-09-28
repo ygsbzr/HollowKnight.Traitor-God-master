@@ -39,9 +39,9 @@ namespace Traitor_God
                     shockwave.AddComponent<DebugColliders>();
 #endif
                     GameObject plane = shockwave.FindGameObjectInChildren("Plane");
-
-                    plane.GetComponent<MeshRenderer>().material.mainTexture = TraitorGod.Sprites[1].texture;
+                    plane.AddComponent<DebugColliders>();
                     shockwave.SetActive(true);
+                    shockwave.PrintSceneHierarchyTree();
                     shockwave.transform.SetPosition2D(new Vector2(pos.x, 28.1f));
                 }
             };
@@ -71,6 +71,7 @@ namespace Traitor_God
             /* Telegraph ground pound with lower pitched DSlash growl */
             IEnumerator GroundPoundJumpAntic()
             {
+                Log("Ground Pound Jump Antic");
                 ParticleSystem.MainModule main = trail.main;
                 main.startColor = Color.red;
 
@@ -86,6 +87,7 @@ namespace Traitor_God
             /* Set jump velocity */
             IEnumerator GroundPoundJump()
             {
+                Log("Ground Pound Jump");
                 anim.Play("Jump");
                 TraitorAudio.PlayAudioClip("Jump");
                 rb.velocity = Vector2.up * jumpVelocity;
@@ -97,6 +99,7 @@ namespace Traitor_God
             /* Set ground pound fall velocity */
             IEnumerator GroundPoundFall()
             {
+                Log("Ground Pound Fall");
                 anim.Play("DSlash");
                 TraitorAudio.PlayAudioClip("DSlash");
                 trans.rotation = Quaternion.Euler(0, 0, -Math.Sign(trans.localScale.x));
@@ -111,6 +114,7 @@ namespace Traitor_God
             /* Land and generate taller shockwaves */
             IEnumerator GroundPoundLand()
             {
+                Log("Ground Pound Land");
                 anim.Play("Land");
                 GameCameras.instance.cameraShakeFSM.SendEvent("SmallShake");
                 rb.velocity = Vector2.zero;
@@ -126,6 +130,7 @@ namespace Traitor_God
             /* Revert back to orange trail */
             IEnumerator GroundPoundRecover()
             {
+                Log("Ground Pound Recover");
                 ParticleSystem.MainModule main = trail.main;
                 main.startColor = Traitor.InfectionOrange;
 

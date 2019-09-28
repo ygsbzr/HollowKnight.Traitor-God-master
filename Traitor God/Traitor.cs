@@ -5,6 +5,8 @@ using System.Linq;
 using HutongGames.PlayMaker.Actions;
 using ModCommon;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using USceneManager = UnityEngine.SceneManagement.SceneManager;
 
 namespace Traitor_God
 {
@@ -29,7 +31,7 @@ namespace Traitor_God
         /* Components */
         public static AudioSource Audio;        // Audio is access by TraitorAudio, so make it public and static
         public static PlayMakerFSM Control;     // Control is accessed by TinkSound, so make it public and static
-        public static PlayMakerFSM MageControl;    // WarriorControl is access by TraitorAudio, so make it public and static
+        public static PlayMakerFSM MageControl;    // MageControl is access by TraitorAudio, so make it public and static
         private tk2dSpriteAnimator _anim;
         private PlayMakerFSM _gpzControl;
         private HealthManager _hm;
@@ -78,6 +80,7 @@ namespace Traitor_God
             if (!PlayerData.instance.statueStateTraitorLord.usingAltVersion)
             {
                 /* Revert to old Traitor Lord and slam wave textures if fighting regular Traitor Lord */
+                Log("Resetting textures");
                 ResetTextures();
 
                 yield break;
@@ -120,7 +123,7 @@ namespace Traitor_God
             /* Miscellaneous */
             ChangeStateValues.ChangeFSMValues(Control);
         }
-
+        
         /* Transition to Wall Fall state when Traitor God is in the DSlash state,
            encounters a wall or roof, and is off the ground */
         private void OnCollisionEnter2D(Collision2D collision)

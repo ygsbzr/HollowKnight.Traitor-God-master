@@ -41,6 +41,7 @@ namespace Traitor_God
 
             IEnumerator TriSpearThrowAntic()
             {
+                Log("Tri-Spear Throw Antic");
                 anim.Play("Sickle Throw Antic");
                 Traitor.Audio.pitch = 1.0f;
                 TraitorAudio.PlayAudioClip("Teleport");
@@ -84,6 +85,7 @@ namespace Traitor_God
 
             IEnumerator TriSpearThrow()
             {
+                Log("Tri-Spear Throw");
                 anim.Play("Sickle Throw Attack");
 
                 foreach (KeyValuePair<GameObject, float> entry in spearDict)
@@ -113,6 +115,7 @@ namespace Traitor_God
 
             IEnumerator TriSpearThrowRecover()
             {
+                Log("Tri-Spear Throw Recover");
                 anim.Play("Attack Recover");
 
                 yield return new WaitForSeconds(1.0f);
