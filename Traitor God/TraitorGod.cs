@@ -16,7 +16,6 @@ namespace Traitor_God
     [UsedImplicitly]
     public class TraitorGod : Mod<SaveSettings>, ITogglableMod
     {
-        
         public static readonly List<Sprite> Sprites = new List<Sprite>();
         public static readonly List<byte[]> SpriteBytes = new List<byte[]>();
         
@@ -53,7 +52,6 @@ namespace Traitor_God
             PreloadedGameObjects.Add("Thorns Right", preloadedObjects["Fungus3_11"]["fungd_spikes_09_FG"]);
             PreloadedGameObjects.Add("Black Thorns", preloadedObjects["Fungus3_11"]["fungd_spike_sil_04"]);
             PreloadedGameObjects.Add("Thorn Point", preloadedObjects["GG_Ghost_No_Eyes_V"]["fungd_spikes_0_0001_d"]);
-            PreloadedGameObjects.Add("Spear", preloadedObjects["GG_Ghost_No_Eyes_V"]["fungd_spikes_0_0001_d"]);
             PreloadedGameObjects.Add("Soul Master", preloadedObjects["GG_Soul_Master"]["Mage Lord"]);
 
             Instance = this;

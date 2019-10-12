@@ -13,15 +13,17 @@ namespace Traitor_God
         {
             foreach (GameObject thorns in thornsList)
             {
-                // GetOrAddComponent here because for some reason the Rigidbody2D cannot be retrieved for the thorns
-                Rigidbody2D rb = thorns.GetOrAddComponent<Rigidbody2D>();
-                rb.isKinematic = true;
-                rb.velocity = Vector2.up * y;
+                if (thorns != null)
+                {
+                    Rigidbody2D rb = thorns.GetComponent<Rigidbody2D>();
+                    rb.isKinematic = true;
+                    rb.velocity = Vector2.up * y;
+                }
             }
         }
 
         /* Retract all existing thorn pillars and destroy them */
-        public static IEnumerator RectractThornPillarsAndDestroy()
+        public static IEnumerator RetractThornPillarsAndDestroy()
         {
             SetThornPillarVelocity(120);
             yield return new WaitForSeconds(1.0f);
@@ -97,7 +99,7 @@ namespace Traitor_God
                     }
                     SpawnThorns("Thorn Point", new Vector2(3, 8), new Vector3(i, 59, 0));
                 }
-                
+
                 SetThornPillarVelocity(-60);
 
                 yield return new WaitForSeconds(0.25f);
@@ -161,7 +163,7 @@ namespace Traitor_God
             }
             fsm.InsertCoroutine("Thorn Pillars Recover", 0, ThornPillarsRecover);
 
-            fsm.GetAction<SendRandomEventV2>("Slam?").AddToSendRandomEventV2("Thorn Pillars Appear", 0.15f, 1);
+            fsm.GetAction<SendRandomEventV2>("Slam?").AddToSendRandomEventV2("Thorn Pillars Appear", 0.33f, 1);
         }
 
         private static void Log(object message) => Modding.Logger.Log($"[Thorn Pillars]: " + message);

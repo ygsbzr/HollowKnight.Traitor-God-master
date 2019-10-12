@@ -134,6 +134,7 @@ namespace Traitor_God
             }
         }
 
+        private int lastCount;
         private void Update()
         {
             if (PlayerData.instance.statueStateTraitorLord.usingAltVersion)
@@ -153,6 +154,12 @@ namespace Traitor_God
                     ThornPillars.AddThornPillars(Control, _anim, _trans);
                 }
             }
+
+            if (lastCount != TriSpearThrow.SpearDict.Count)
+            {
+                lastCount = TriSpearThrow.SpearDict.Count;
+                Log("SpearDict Count: " + TriSpearThrow.SpearDict.Count);
+            }
         }
 
         private static void Log(object message) => Modding.Logger.Log($"[Traitor]: " + message);
@@ -169,7 +176,12 @@ namespace Traitor_God
         /* Begin Coroutine to retract and destroy any existing thorn pillars upon boss death */
         private void DeathHandler()
         {
-            StartCoroutine(ThornPillars.RectractThornPillarsAndDestroy());
+            StartCoroutine(ThornPillars.RetractThornPillarsAndDestroy());
+            foreach (KeyValuePair<GameObject, float> entry in TriSpearThrow.SpearDict)
+            {
+                GameObject spear = entry.Key;
+                Destroy(spear);
+            }
         }
 
         private void ResetTextures()
