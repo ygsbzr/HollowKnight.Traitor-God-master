@@ -12,23 +12,23 @@ namespace Traitor_God
 {
     internal class Traitor : MonoBehaviour
     {
-        /* Health values */
-        private const int Phase1Health = 500;
-        public const int Phase2Health = 1000;
-        public const int Phase3Health = 1000;
-        private const int TotalHealth = Phase1Health + Phase2Health + Phase3Health;
+        // Health values
+        private int Phase1Health;
+        public static int Phase2Health;
+        public static int Phase3Health;
+        private int TotalHealth;
 
-        /* DSlash targeting value */
+        // DSlash targeting value
         private readonly int _dSlashSpeed = 75;
 
-        /* Phase Boolean triggers */
+        // Phase Boolean triggers
         private bool _enteredPhase2;
         private bool _enteredPhase3;
 
-        /* Color of infection trails */
+        // Color of infection trails
         public static Color InfectionOrange = new Color32(255, 50, 0, 255);
 
-        /* Components */
+        // Components
         public static AudioSource Audio;        // Audio is access by TraitorAudio, so make it public and static
         public static PlayMakerFSM Control;     // Control is accessed by TinkSound, so make it public and static
         public static PlayMakerFSM MageControl;    // MageControl is access by TraitorAudio, so make it public and static
@@ -38,7 +38,7 @@ namespace Traitor_God
         private Rigidbody2D _rb;
         private Transform _trans;
 
-        /* Trail left behind by Traitor God */
+        // Trail left behind by Traitor God
         private ParticleSystem _trail;
 
         private void Awake()
@@ -46,9 +46,9 @@ namespace Traitor_God
             _anim = gameObject.GetComponent<tk2dSpriteAnimator>();
             Audio = gameObject.GetComponent<AudioSource>();
             Control = gameObject.LocateMyFSM("Mantis");
-            /* Used to spawn shockwaves */
+            // Used to spawn shockwaves
             _gpzControl = TraitorGod.PreloadedGameObjects["GPZ"].LocateMyFSM("Control");
-            /* Used for teleport sound */
+            // Used for teleport sound
             MageControl = TraitorGod.PreloadedGameObjects["Soul Master"].LocateMyFSM("Mage Lord");
             _hm = gameObject.GetComponent<HealthManager>();
             _rb = gameObject.GetComponent<Rigidbody2D>();
@@ -58,9 +58,25 @@ namespace Traitor_God
             Log("Using alt version2: " + PlayerData.instance.GetVariable<BossStatue.Completion>("statueStateTraitor").usingAltVersion);
             if (PlayerData.instance.statueStateTraitorLord.usingAltVersion)
             {
+                // Variable health values at different difficulties
+                int bossLevel = BossSceneController.Instance.BossLevel;
+                if (bossLevel > 0)
+                {
+                    Phase1Health = 600;
+                    Phase2Health = 1200;
+                    Phase3Health = 1200;
+                }
+                else
+                {
+                    Phase1Health = 500;
+                    Phase2Health = 1000;
+                    Phase3Health = 1000;
+                }
+
+                TotalHealth = Phase1Health + Phase2Health + Phase3Health;
                 _hm.hp = TotalHealth;
 # if DEBUG
-                /* Enter phase 3 immediately */
+                // Enter phase 3 immediately
                 _hm.hp = 999;
 # endif
 
@@ -72,60 +88,60 @@ namespace Traitor_God
         {
             yield return null;
 
-            while (HeroController.instance == null)
-            {
-                yield return null;
-            }
+            while (HeroController.instance == null) yield return null;
 
             if (!PlayerData.instance.statueStateTraitorLord.usingAltVersion)
             {
-                /* Revert to old Traitor Lord and slam wave textures if fighting regular Traitor Lord */
+                // Revert to old Traitor Lord and slam wave textures if fighting regular Traitor Lord
                 Log("Resetting textures");
                 ResetTextures();
+                _anim.GetClipByName("Attack Antic").fps = 12;    // Reset Slash animation speed
 
                 yield break;
             }
 
             _trail = Trail.AddTrail(gameObject, 4, 0.8f, 1.5f, 2, 1.8f, InfectionOrange);
 
-            /* Disable empty walks */
+            // Disable empty walks
             Control.RemoveTransition("Feint?", "Feint");
 
-            /* Disable slam repeat */
+            // Disable slam repeat
             Control.RemoveTransition("Check L", "Repeat?");
             Control.RemoveTransition("Check R", "Repeat?");
             Control.RemoveTransition("Repeat?", "Repeat");
             Control.RemoveTransition("Repeat", "Too Close?");
 
-            /* Add trail to sickles on Sickle Throw */
-            Control.InsertMethod("Sickle Throw Recover", 0, AddSickleTrails);
-            /* Target the player during DSlash */
+            // Add trail to sickles on Sickle Throw
+            Control.InsertMethod("Sickle Throw", 9, AddSickleTrails);
+            // Target the player during DSlash
             Control.InsertMethod("DSlash Antic", 0, DSlashTargetPlayer);
-            /* Summon two sickles when slashing */
+            // Summon two sickles when slashing
             Control.InsertMethod("Attack Swipe", 0, SpawnSickles(40, 2));
-            /* Spawn shockwaves when landing after a DSlash */
+            // Spawn shockwaves when landing after a DSlash
             Control.InsertMethod("Land", 0, GroundPound.SpawnShockwaves(transform, _gpzControl, 1, 1, 25, 2));
 
-            /* Loop DSlash animation */
+            // Loop DSlash animation
             _anim.GetClipByName("DSlash").wrapMode = tk2dSpriteAnimationClip.WrapMode.Loop;
-
+            
+            // Speed up Slash animation
+            _anim.GetClipByName("Attack Antic").fps = 15;
+            
             Log("Changing to New Sprites");
-            /* Change sprites using Mola's Traitor God sprite sheets */
+            // Change sprites using Mola's Traitor God sprite sheets
             gameObject.GetComponent<tk2dSprite>().GetCurrentSpriteDef().material.mainTexture =
                 TraitorGod.Sprites[0].texture;
-            /* Change color of waves using Mola's waves sprite sheet */
+            // Change color of waves using Mola's waves sprite sheet
             ChangeWaveSprite(1);
 
-            /* Add new moves to Phase 1 */
+            // Add new moves to Phase 1
             GroundPound.AddGroundPound(Control, _gpzControl, _trail, _anim, _rb, _trans);
             WallFall.AddWallFall(Control, _anim, _rb, _trans);
 
-            /* Miscellaneous */
+            // Miscellaneous
             ChangeStateValues.ChangeFSMValues(Control);
         }
         
-        /* Transition to Wall Fall state when Traitor God is in the DSlash state,
-           encounters a wall or roof, and is off the ground */
+        // Transition to Wall Fall state when Traitor God is in the DSlash state, encounters a wall or roof, and is off the ground
         private void OnCollisionEnter2D(Collision2D collision)
         {
             if (Control.ActiveStateName == "DSlash" && collision.collider.gameObject.layer == 8 && transform.position.y > 31.6)
@@ -139,7 +155,7 @@ namespace Traitor_God
         {
             if (PlayerData.instance.statueStateTraitorLord.usingAltVersion)
             {
-                /* Hacky method of dividing fight into 3 phases */
+                // Hacky method of dividing fight into 3 phases
                 if (_hm.hp < (Phase2Health + Phase3Health) && !_enteredPhase2)
                 {
                     Log("Entered Phase 2");
@@ -173,7 +189,7 @@ namespace Traitor_God
             gameObjectList.Clear();
         }
 
-        /* Begin Coroutine to retract and destroy any existing thorn pillars upon boss death */
+        // Begin Coroutine to retract and destroy any existing thorn pillars upon boss death
         private void DeathHandler()
         {
             StartCoroutine(ThornPillars.RetractThornPillarsAndDestroy());
@@ -190,7 +206,7 @@ namespace Traitor_God
             ChangeWaveSprite(5);
         }
 
-        /* Add a trail to all GameObjects with the name "Shot Traitor Lord(Clone)" */
+        // Add a trail to all GameObjects with the name "Shot Traitor Lord(Clone)"
         private void AddSickleTrails()
         {
             IEnumerable<GameObject> sickles = FindObjectsOfType<GameObject>().Where(obj => obj.name == "Shot Traitor Lord(Clone)");
@@ -201,7 +217,7 @@ namespace Traitor_God
             }
         }
 
-        /* Always target the player on DSlash */
+        // Always target the player on DSlash
         private void DSlashTargetPlayer()
         {
             Vector2 dSlashVector = TriSpearThrow.GetVectorToPlayer(_trans) * _dSlashSpeed; ;
@@ -210,7 +226,7 @@ namespace Traitor_God
             Control.GetAction<SetVelocity2d>("DSlash").y = dSlashVector.y;
         }
 
-        /* Spawn sickles during slash */
+        // Spawn sickles during slash
         private Action SpawnSickles(float speed, int damage)
         {
             return () =>
@@ -238,7 +254,7 @@ namespace Traitor_God
             };
         }
 
-        /* Change slam wave sprite sheet using index of TraitorGod.SPRITES variable */
+        // Change slam wave sprite sheet using index of TraitorGod.SPRITES variable
         private void ChangeWaveSprite(int spriteIndex)
         {
             Vector3 position = Vector3.zero;

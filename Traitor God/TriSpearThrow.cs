@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using HutongGames.PlayMaker.Actions;
 using ModCommon;
 using UnityEngine;
@@ -28,6 +29,7 @@ namespace Traitor_God
         {
             string[] states =
             {
+                "Tri-Spear Throw Backstep",
                 "Tri-Spear Throw Antic",
                 "Tri-Spear Throw",
                 "Tri-Spear Throw Recover",
@@ -35,11 +37,21 @@ namespace Traitor_God
 
             fsm.CreateStates(states);
 
+            IEnumerator TriSpearThrowBackstep()
+            {
+                Traitor.Audio.pitch = 1.0f;
+                Traitor.Audio.time = 0.25f;
+                TraitorAudio.PlayAudioClip("Slash Antic");
+                anim.Play("Walk");
+                rb.velocity = new Vector2(-trans.localScale.x * 15, 0);
+                yield return new WaitForSeconds(0.3f);
+            }
+            fsm.InsertCoroutine("Tri-Spear Throw Backstep", 0, TriSpearThrowBackstep);
+            
             IEnumerator TriSpearThrowAntic()
             {
                 Log("Tri-Spear Throw Antic");
                 anim.Play("Sickle Throw Antic");
-                Traitor.Audio.pitch = 1.0f;
                 TraitorAudio.PlayAudioClip("Teleport");
                 rb.velocity = Vector2.zero;
 
@@ -123,7 +135,7 @@ namespace Traitor_God
             }
             fsm.InsertCoroutine("Tri-Spear Throw Recover", 0, TriSpearThrowRecover);
 
-            fsm.GetAction<SendRandomEventV2>("Attack Choice").AddToSendRandomEventV2("Tri-Spear Throw Antic", 0.33f, 1);
+            fsm.GetAction<SendRandomEventV2>("Attack Choice").AddToSendRandomEventV2("Tri-Spear Throw Backstep", 0.33f, 1);
         }
 
         private static void Log(object message) => Modding.Logger.Log($"[Tri-Spear Throw]: " + message);

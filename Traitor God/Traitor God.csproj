@@ -11,12 +11,19 @@
   </PropertyGroup>
   
   <ItemGroup>
-    <EmbeddedResource Include="Assets\0_TraitorGod.png" />
-    <EmbeddedResource Include="Assets\1_Waves.png" />
-    <EmbeddedResource Include="Assets\2_TraitorSpear.png" />
-    <EmbeddedResource Include="Assets\3_TraitorSpearBlur.png" />
-    <EmbeddedResource Include="Assets\4_TraitorLord.png" />
-    <EmbeddedResource Include="Assets\5_Waves.png" />
+    <None Remove="Assets\Shaders\Sprites-Diffuse_Flash.shader" />
+    <None Remove="Assets\Sprites\0_TraitorGod.png" />
+    <EmbeddedResource Include="Assets\Sprites\0_TraitorGod.png" />
+    <None Remove="Assets\Sprites\1_Waves.png" />
+    <EmbeddedResource Include="Assets\Sprites\1_Waves.png" />
+    <None Remove="Assets\Sprites\2_TraitorSpear.png" />
+    <EmbeddedResource Include="Assets\Sprites\2_TraitorSpear.png" />
+    <None Remove="Assets\Sprites\3_TraitorSpearBlur.png" />
+    <EmbeddedResource Include="Assets\Sprites\3_TraitorSpearBlur.png" />
+    <None Remove="Assets\Sprites\4_TraitorLord.png" />
+    <EmbeddedResource Include="Assets\Sprites\4_TraitorLord.png" />
+    <None Remove="Assets\Sprites\5_Waves.png" />
+    <EmbeddedResource Include="Assets\Sprites\5_Waves.png" />
   </ItemGroup>
 
   <ItemGroup>

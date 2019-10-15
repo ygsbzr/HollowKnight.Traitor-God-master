@@ -18,6 +18,8 @@ namespace Traitor_God
     {
         public static readonly List<Sprite> Sprites = new List<Sprite>();
         public static readonly List<byte[]> SpriteBytes = new List<byte[]>();
+
+        public static Shader FlashShader;
         
         [PublicAPI]
         public static TraitorGod Instance { get; private set; }
@@ -98,7 +100,7 @@ namespace Traitor_God
                     index++;
                 }
             }
-                        
+
             Log("Initialized.");
         }
 
