@@ -139,7 +139,7 @@ namespace Traitor_God
                 case "TRAITOR_LORD_SUB" when _previousScene == "GG_Workshop" && PlayerData.instance.statueStateTraitorLord.usingAltVersion:
                     return "God";
                 case "Traitor_Desc":
-                    return "Renegade god of fury";
+                    return "Renegade god of corruption";
                 default:
                     return Language.Language.GetInternal(key, sheettitle);
             }
