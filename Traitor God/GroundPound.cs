@@ -38,8 +38,6 @@ namespace Traitor_God
 #if DEBUG
                     shockwave.AddComponent<DebugColliders>();
 #endif
-                    GameObject plane = shockwave.FindGameObjectInChildren("Plane");
-                    plane.AddComponent<DebugColliders>();
                     shockwave.SetActive(true);
                     shockwave.PrintSceneHierarchyTree();
                     shockwave.transform.SetPosition2D(new Vector2(pos.x, 28.1f));
