@@ -1,6 +1,5 @@
 ﻿using System.Collections;
 using System.Reflection;
-using ModCommon;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Logger = Modding.Logger;

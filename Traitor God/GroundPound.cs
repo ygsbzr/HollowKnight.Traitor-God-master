@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using HutongGames.PlayMaker.Actions;
-using ModCommon;
 using UnityEngine;
 
 namespace Traitor_God
@@ -39,7 +38,6 @@ namespace Traitor_God
                     shockwave.AddComponent<DebugColliders>();
 #endif
                     shockwave.SetActive(true);
-                    shockwave.PrintSceneHierarchyTree();
                     shockwave.transform.SetPosition2D(new Vector2(pos.x, 28.1f));
                 }
             };

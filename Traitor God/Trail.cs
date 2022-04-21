@@ -21,7 +21,7 @@ namespace Traitor_God
                 return new ParticleSystem();
             }
             ParticleSystemRenderer rend = trail.GetComponent<ParticleSystemRenderer>();
-            rend.material = rend.trailMaterial = new Material(Shader.Find("Particles/Additive (Soft)"))
+            rend.material = rend.trailMaterial = new Material(Shader.Find("Legacy Shaders/Particles/Additive (Soft)"))
             {
                 mainTexture = Resources.FindObjectsOfTypeAll<Texture>().FirstOrDefault(x => x.name == "Default-Particle"),
                 color = c ?? Color.white

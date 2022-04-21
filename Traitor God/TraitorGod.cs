@@ -14,7 +14,7 @@ using UObject = UnityEngine.Object;
 namespace Traitor_God
 {
     [UsedImplicitly]
-    public class TraitorGod : Mod<SaveSettings>, ITogglableMod
+    public class TraitorGod : Mod, ITogglableMod,ILocalSettings<SaveSettings>
     {
         public static readonly List<Sprite> Sprites = new List<Sprite>();
         public static readonly List<byte[]> SpriteBytes = new List<byte[]>();
@@ -45,7 +45,9 @@ namespace Traitor_God
                 ("GG_Soul_Master", "Mage Lord"),
             };
         }
-        
+        public static SaveSettings Settings = new();
+        public void OnLoadLocal(SaveSettings s)=>Settings = s;
+        public SaveSettings OnSaveLocal() => Settings;
         public override void Initialize(Dictionary<string, Dictionary<string, GameObject>> preloadedObjects)
         {
             Log("Storing GameObjects");
@@ -62,13 +64,12 @@ namespace Traitor_God
 
             Unload();
 
-            ModHooks.Instance.BeforeSavegameSaveHook += BeforeSaveGameSave;
-            ModHooks.Instance.AfterSavegameLoadHook += SaveGame;
-            ModHooks.Instance.SavegameSaveHook += SaveGameSave;
-            ModHooks.Instance.NewGameHook += AddComponent;
-            ModHooks.Instance.LanguageGetHook += OnLangGet;
-            ModHooks.Instance.SetPlayerVariableHook += SetVariableHook;
-            ModHooks.Instance.GetPlayerVariableHook += GetVariableHook;
+            ModHooks.BeforeSavegameSaveHook += BeforeSaveGameSave;
+            ModHooks.SavegameSaveHook += SaveGameSave;
+            On.HeroController.Start += AddComponent;
+            ModHooks.LanguageGetHook += OnLangGet;
+            ModHooks.SetPlayerVariableHook += SetVariableHook;
+            ModHooks.GetPlayerVariableHook += GetVariableHook;
             USceneManager.activeSceneChanged += SceneChanged;
             
             // Taken from https://github.com/SalehAce1/PaleChampion/blob/master/PaleChampion/PaleChampion/PaleChampion.cs
@@ -104,6 +105,16 @@ namespace Traitor_God
             Log("Initialized.");
         }
 
+        private void AddComponent(On.HeroController.orig_Start orig, HeroController self)
+        {
+            orig(self);
+            SaveGameSave();
+            if(GameManager.instance.gameObject.GetComponent<TraitorFinder>()==null)
+            {
+                GameManager.instance.gameObject.AddComponent<TraitorFinder>();
+            }
+        }
+
         private object SetVariableHook(Type t, string key, object obj)
         {
             if (key == "statueStateTraitor")
@@ -123,7 +134,7 @@ namespace Traitor_God
             _previousScene = previousScene.name;
         }
 
-        private string OnLangGet(string key, string sheettitle)
+        private string OnLangGet(string key, string sheettitle,string orig)
         {
             /*string text = Language.Language.GetInternal(key, sheettitle);
             Log("Key: " + key);
@@ -141,7 +152,7 @@ namespace Traitor_God
                 case "Traitor_Desc":
                     return "Renegade god of corruption";
                 default:
-                    return Language.Language.GetInternal(key, sheettitle);
+                    return orig;
             }
         }
 
@@ -152,31 +163,20 @@ namespace Traitor_God
             PlayerData.instance.statueStateTraitorLord.usingAltVersion = false;
         }
 
-        private void SaveGame(SaveGameData data)
-        {
-            SaveGameSave();
-            AddComponent();
-        }
-
         private void SaveGameSave(int id = 0)
         {
             PlayerData.instance.statueStateTraitorLord.usingAltVersion = Settings.AltStatue;
         }
 
-        private static void AddComponent()
-        {
-            GameManager.instance.gameObject.AddComponent<TraitorFinder>();
-        }
 
         public void Unload()
         {
-            ModHooks.Instance.BeforeSavegameSaveHook -= BeforeSaveGameSave;
-            ModHooks.Instance.AfterSavegameLoadHook -= SaveGame;
-            ModHooks.Instance.SavegameSaveHook -= SaveGameSave;
-            ModHooks.Instance.NewGameHook -= AddComponent;
-            ModHooks.Instance.LanguageGetHook -= OnLangGet;
-            ModHooks.Instance.SetPlayerVariableHook -= SetVariableHook;
-            ModHooks.Instance.GetPlayerVariableHook -= GetVariableHook;
+            ModHooks.BeforeSavegameSaveHook -= BeforeSaveGameSave;
+            ModHooks.SavegameSaveHook -= SaveGameSave;
+            On.HeroController.Start -= AddComponent;
+            ModHooks.LanguageGetHook -= OnLangGet;
+            ModHooks.SetPlayerVariableHook -= SetVariableHook;
+            ModHooks.GetPlayerVariableHook -= GetVariableHook;
             USceneManager.activeSceneChanged -= SceneChanged;
 
             TraitorFinder finder = GameManager.instance.gameObject.GetComponent<TraitorFinder>();

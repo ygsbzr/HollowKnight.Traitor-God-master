@@ -84,7 +84,8 @@ namespace Traitor_God
             transitions.Add(new FsmTransition
             {
                 FsmEvent = @event,
-                ToState = toState
+                ToState = toState,
+                
             });
             t.Transitions = transitions.ToArray();
         }
@@ -98,7 +99,7 @@ namespace Traitor_God
             transitions.Add(new FsmTransition
             {
                 FsmEvent = new FsmEvent(eventName),
-                ToState = toState
+                ToState = toState,
             });
             t.Transitions = transitions.ToArray();
         }
@@ -168,7 +169,7 @@ namespace Traitor_God
         {
             var fsm = sre.Fsm.Owner as PlayMakerFSM;
             string state = sre.State.Name;
-            eventName = eventName ?? toState.Split(' ').First();
+            eventName = eventName ?? toState.Split(' ').First().ToUpper();
 
             List<FsmEvent> events = sre.events.ToList();
             List<FsmFloat> weights = sre.weights.ToList();
@@ -176,6 +177,7 @@ namespace Traitor_God
             List<FsmInt> eventMax = sre.eventMax.ToList();
 
             fsm.AddTransition(state, eventName, toState);
+            fsm.FixTrans(state);
 
             events.Add(fsm.GetState(state).Transitions.Single(x => x.FsmEvent.Name == eventName).FsmEvent);
             weights.Add(weight);
@@ -209,6 +211,18 @@ namespace Traitor_God
                 fsm.CreateState(state);
                 fsm.AddTransition(state, FsmEvent.Finished,
                     i + 1 < stateNames.Length ? stateNames[i + 1] : "Idle");
+            }
+            for (int i = 0; i < stateNames.Length; i++)
+            {
+                fsm.FixTrans(stateNames[i]);
+            }
+            
+        }
+        public static void FixTrans(this PlayMakerFSM fsm,string statename)
+        {
+            foreach(var tran in fsm.GetState(statename).Transitions)
+            {
+                tran.ToFsmState = fsm.GetState(tran.ToState);
             }
         }
         
