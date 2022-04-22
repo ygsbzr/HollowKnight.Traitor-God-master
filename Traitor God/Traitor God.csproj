@@ -33,14 +33,11 @@
 		<Private>false</Private>
     </Reference>
     <Reference Include="MMHOOK_Assembly-CSharp">
-      <HintPath>..\..\1.5Moddingapi\MMHOOK_Assembly-CSharp.dll</HintPath>
+      <HintPath>$(HKModdingPath)MMHOOK_Assembly-CSharp.dll</HintPath>
+		<Private>false</Private>
     </Reference>
     <Reference Include="PlayMaker, Version=1.6.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>$(HKModdingPath)PlayMaker.dll</HintPath>
-		<Private>false</Private>
-    </Reference>
-    <Reference Include="Satchel">
-      <HintPath>$(HKModdingPath)Satchel.dll</HintPath>
 		<Private>false</Private>
     </Reference>
     <Reference Include="UnityEngine, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
@@ -58,9 +55,6 @@
     <Reference Include="UnityEngine.ImageConversionModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>$(HKModdingPath)UnityEngine.ImageConversionModule.dll</HintPath>
 		<Private>false</Private>
-    </Reference>
-    <Reference Include="UnityEngine.InputLegacyModule">
-      <HintPath>..\..\1.5Moddingapi\UnityEngine.InputLegacyModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.JSONSerializeModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>$(HKModdingPath)UnityEngine.JSONSerializeModule.dll</HintPath>
