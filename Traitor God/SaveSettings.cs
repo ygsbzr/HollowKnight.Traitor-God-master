@@ -15,6 +15,7 @@ namespace Traitor_God
         };
 
         public bool AltStatue;
+        public bool Boosdoor = false;
        
     }
 }

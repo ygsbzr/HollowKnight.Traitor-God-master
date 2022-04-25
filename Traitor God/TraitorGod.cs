@@ -14,7 +14,7 @@ using UObject = UnityEngine.Object;
 namespace Traitor_God
 {
     [UsedImplicitly]
-    public class TraitorGod : Mod, ITogglableMod,ILocalSettings<SaveSettings>
+    public class TraitorGod : Mod, ITogglableMod,ILocalSettings<SaveSettings>,IMenuMod
     {
         public static readonly List<Sprite> Sprites = new List<Sprite>();
         public static readonly List<byte[]> SpriteBytes = new List<byte[]>();
@@ -167,7 +167,32 @@ namespace Traitor_God
         {
             PlayerData.instance.statueStateTraitorLord.usingAltVersion = Settings.AltStatue;
         }
-
+        public bool ToggleButtonInsideMenu => true;
+        public List<IMenuMod.MenuEntry> GetMenuData(IMenuMod.MenuEntry? menu)
+        {
+            List<IMenuMod.MenuEntry> menus = new();
+            menus.Add(
+                new()
+                { Name="Enter Pantheon",
+                Description="Choose if Traitor god enable in p4 and p5(choose Traitor God Statue in hog)",
+                Values=new string[] { Language.Language.Get("MOH_ON", "MainMenu"), Language.Language.Get("MOH_OFF", "MainMenu") },
+                Saver=i=>ChooseEnter(i),
+                Loader=()=>Settings.Boosdoor ? 0:1
+                }
+                );
+            return menus;
+        }
+        private void ChooseEnter(int i)
+        {
+            if (i == 0)
+            {
+                Settings.Boosdoor = true;
+            }
+            else
+            {
+                Settings.Boosdoor = false;
+            }
+        }
 
         public void Unload()
         {
