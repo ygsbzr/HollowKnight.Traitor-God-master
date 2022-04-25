@@ -177,7 +177,7 @@ namespace Traitor_God
                 Description="Choose if Traitor god enable in p4 and p5(choose Traitor God Statue in hog)",
                 Values=new string[] { Language.Language.Get("MOH_ON", "MainMenu"), Language.Language.Get("MOH_OFF", "MainMenu") },
                 Saver=i=>ChooseEnter(i),
-                Loader=()=>Settings.Boosdoor ? 0:1
+                Loader=()=>Settings.Bossdoor ? 0:1
                 }
                 );
             return menus;
@@ -186,11 +186,11 @@ namespace Traitor_God
         {
             if (i == 0)
             {
-                Settings.Boosdoor = true;
+                Settings.Bossdoor = true;
             }
             else
             {
-                Settings.Boosdoor = false;
+                Settings.Bossdoor = false;
             }
         }
 
