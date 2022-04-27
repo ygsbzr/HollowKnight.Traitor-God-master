@@ -68,6 +68,9 @@
       <HintPath>$(HKModdingPath)UnityEngine.Physics2DModule.dll</HintPath>
 		<Private>false</Private>
     </Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>..\..\1.5Moddingapi\UnityEngine.UI.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <None Include="Traitor God.csproj" />

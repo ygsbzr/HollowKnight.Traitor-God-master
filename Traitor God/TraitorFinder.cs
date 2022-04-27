@@ -30,7 +30,7 @@ namespace Traitor_God
             if (next == "GG_Workshop") SetStatue();
             
             if (next != "GG_Traitor_Lord") yield break;
-            if (!TraitorGod.Settings.BossDoor) yield break;
+            if (!TraitorGod.Settings.BossDoor&&BossSequenceController.IsInSequence) yield break;
 
             StartCoroutine(AddComponent());
         }

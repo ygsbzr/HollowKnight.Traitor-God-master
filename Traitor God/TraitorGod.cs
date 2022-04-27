@@ -8,7 +8,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using USceneManager = UnityEngine.SceneManagement.SceneManager;
 using UObject = UnityEngine.Object;
-
+using UnityEngine.UI;
 // Taken and modified from https://github.com/5FiftySix6/HollowKnight.Pale-Prince/blob/master/Pale%20Prince/PalePrince.cs
 
 namespace Traitor_God
@@ -113,6 +113,15 @@ namespace Traitor_God
             {
                 GameManager.instance.gameObject.AddComponent<TraitorFinder>();
             }
+            RefreshMenu();
+        }
+        public void RefreshMenu()
+        {
+            MenuScreen menu = ModHooks.BuiltModMenuScreens[this];
+            foreach (var option in menu.gameObject.GetComponentsInChildren<MenuOptionHorizontal>())
+            {
+                option.menuSetting.RefreshValueFromGameSettings();
+            }
         }
 
         private object SetVariableHook(Type t, string key, object obj)
@@ -167,7 +176,7 @@ namespace Traitor_God
         {
             PlayerData.instance.statueStateTraitorLord.usingAltVersion = Settings.AltStatue;
         }
-        public bool ToggleButtonInsideMenu => true;
+        public bool ToggleButtonInsideMenu => false;
         public List<IMenuMod.MenuEntry> GetMenuData(IMenuMod.MenuEntry? menu)
         {
             List<IMenuMod.MenuEntry> menus = new();
@@ -177,7 +186,7 @@ namespace Traitor_God
                 Description="Choose if Traitor god enable in p4 and p5(choose Traitor God Statue in hog)",
                 Values=new string[] { Language.Language.Get("MOH_ON", "MainMenu"), Language.Language.Get("MOH_OFF", "MainMenu") },
                 Saver=i=>ChooseEnter(i),
-                Loader=()=>Settings.Bossdoor ? 0:1
+                Loader=()=>Settings.BossDoor ? 0:1
                 }
                 );
             return menus;
@@ -186,11 +195,11 @@ namespace Traitor_God
         {
             if (i == 0)
             {
-                Settings.Bossdoor = true;
+                Settings.BossDoor = true;
             }
             else
             {
-                Settings.Bossdoor = false;
+                Settings.BossDoor = false;
             }
         }
 
